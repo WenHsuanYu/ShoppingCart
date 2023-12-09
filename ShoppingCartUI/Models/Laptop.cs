@@ -14,7 +14,9 @@ namespace ShoppingCartUI.Models
         [Required]
         public int BrandId { get; set; }
         #pragma warning disable CS8618
-        public Brand Brand;
+        public Brand Brand { get; set; }
+        public List<CartDetail> CartDetail { get; set; }
+        public List<OrderDetail> OrderDetail { get; set; }
 
     }
 }
