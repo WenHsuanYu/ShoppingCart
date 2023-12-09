@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShoppingCartUI.Models
 {
-    [Table("Brands")]
+    [Table("Brand")]
     public class Brand
     {
         public int Id { get; set; }
