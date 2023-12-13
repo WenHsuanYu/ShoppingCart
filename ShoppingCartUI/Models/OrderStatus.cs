@@ -8,6 +8,9 @@ namespace ShoppingCartUI.Models
     {
         public int Id { get; set; }
         [Required]
+        public int StatusId { get; set; }
+
+        [Required]
         [MaxLength(20, ErrorMessage = "Name cannot exceed 20 characters")]
         public string? StatusName { get; set; }
     }
