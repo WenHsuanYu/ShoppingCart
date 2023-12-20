@@ -1,8 +1,50 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Laptop store";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="my-2">
+<form class="row row-cols-lg-auto g-3 align-items-center">
+
+  <div class="col-12">
+    <label class="visually-hidden" for="inlineFormSelectPref">Brand</label>
+    <select class="form-select" id="BrandId">
+      <option selected>Choose...</option>
+      <option value="1">ASUS</option>
+      <option value="2">MSI</option>
+      <option value="3">GIGABYTE</option>
+      <option value="4">Dell</option>
+      <option value="5">Acer</option>
+      <option value="6">HP</option>
+      <option value="7">Lenovo</option>
+    </select>
+  </div>
+
+   <div class="col-12">
+    <label class="visually-hidden" for="inlineFormInputGroupUsername">Search by Model Name</label>
+    <div class="input-group">
+      <div class="input-group-text"></div>
+      <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="Search by Model Name">
+    </div>
+  </div>
+
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </div>
+</form>
+</div>
+
+<div class="w-100 d-flex flex-wrap mt-4">
+    @for (int i = 1; i <= 9; i++) {
+    <div class="card mx-2 mb-4" style="width: 16rem;">
+      @* <img src="https://picsum.photos/200/300" class="card-img-top" alt="..."> *@
+      <div class="card-body">
+        <h5 class="card-title">Model Name</h5>
+        <p class="card-text">
+            Processor:
+            Price: 
+        </p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+    }
 </div>
