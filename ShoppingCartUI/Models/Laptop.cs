@@ -8,6 +8,11 @@ namespace ShoppingCartUI.Models
     {
         public int Id { get; set; }
         public string ModelName { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(60)]
+        public string? Processor { get; set; }
+
         [Required]
         public double Price { get; set; }
         public string? Image { get; set; }
