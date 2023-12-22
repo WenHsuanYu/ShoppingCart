@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ShoppingCartUI.Models;
+using ShoppingCartUI.Models.DTOs;
 using System.Diagnostics;
 
 namespace ShoppingCartUI.Controllers
@@ -7,15 +7,26 @@ namespace ShoppingCartUI.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IHomeRepository _homeRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IHomeRepository homeRepository)
         {
+            _homeRepository = homeRepository;
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string searchText = "", int BrandId = 0)
         {
-            return View();
+            var laptops = await _homeRepository.GetLaptopsAsync(searchText, BrandId);
+            var brands = await _homeRepository.GetBrandsAsync();
+            var laptopDTO = new LaptopDTO()
+            {
+                Laptops = laptops,
+                Brands = brands,
+                SearchText = searchText,
+                BrandId = BrandId
+            };
+            return View(laptopDTO);
         }
 
         public IActionResult Privacy()

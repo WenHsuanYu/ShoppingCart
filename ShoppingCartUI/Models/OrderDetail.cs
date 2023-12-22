@@ -17,6 +17,6 @@ namespace ShoppingCartUI.Models
         public double UnitPrice { get; set; }
         public Order Order { get; set; }
         public Laptop Laptop { get; set; }
-         
+
     }
 }
