@@ -10,9 +10,11 @@ namespace ShoppingCartUI.Data
             var userMgr = service.GetService<UserManager<IdentityUser>>();
             var roleMgr = service.GetService<RoleManager<IdentityRole>>();
             //adding some roles to db
-            await roleMgr.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
-            await roleMgr.CreateAsync(new IdentityRole(Roles.User.ToString()));
-
+            if (roleMgr is not null)
+            {
+                await roleMgr.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
+                await roleMgr.CreateAsync(new IdentityRole(Roles.User.ToString()));
+            }
             // create admin user
             var admin = new IdentityUser
             {
@@ -21,7 +23,7 @@ namespace ShoppingCartUI.Data
                 EmailConfirmed = true
 
             };
-
+         
             var UserInDb = await userMgr.FindByEmailAsync(admin.Email);
             if (UserInDb is null)
             {
