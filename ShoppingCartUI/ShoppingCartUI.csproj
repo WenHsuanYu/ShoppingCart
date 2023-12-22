@@ -8,6 +8,44 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="wwwroot\img\14-eh1028TU.webp" />
+    <Content Include="wwwroot\img\14-EP0078TU.webp" />
+    <Content Include="wwwroot\img\15-fc0037AU.webp" />
+    <Content Include="wwwroot\img\250G9.webp" />
+    <Content Include="wwwroot\img\A13UDX-210TW.webp" />
+    <Content Include="wwwroot\img\A1MG-011TW.webp" />
+    <Content Include="wwwroot\img\AORUS159SF.webp" />
+    <Content Include="wwwroot\img\AORUS15XASF.webp" />
+    <Content Include="wwwroot\img\AORUS17XAXF.webp" />
+    <Content Include="wwwroot\img\AspireA715-76G-506G.webp" />
+    <Content Include="wwwroot\img\B13VGK-057TW.webp" />
+    <Content Include="wwwroot\img\B13VGK-492TW.webp" />
+    <Content Include="wwwroot\img\C7VEK-037TW.webp" />
+    <Content Include="wwwroot\img\G15-5530-R1888WTW.webp" />
+    <Content Include="wwwroot\img\G5KF.webp" />
+    <Content Include="wwwroot\img\G5MF5.webp" />
+    <Content Include="wwwroot\img\gamingf15.webp" />
+    <Content Include="wwwroot\img\IdeaPadSlim1i.webp" />
+    <Content Include="wwwroot\img\IdeaPadSlim3.webp" />
+    <Content Include="wwwroot\img\Ins13-5330-R2808STW.webp" />
+    <Content Include="wwwroot\img\Latitude5440-I716G512G.webp" />
+    <Content Include="wwwroot\img\LOQ15IRH882XV00MWTW.webp" />
+    <Content Include="wwwroot\img\Nitro5AN515-58-5427.webp" />
+    <Content Include="wwwroot\img\noimage.webp" />
+    <Content Include="wwwroot\img\OMENGaming16-xf0019AX.webp" />
+    <Content Include="wwwroot\img\PredatorPHN16-71-79C7.webp" />
+    <Content Include="wwwroot\img\rogflowx13.webp" />
+    <Content Include="wwwroot\img\SwiftGOSFG14-72T-577W.webp" />
+    <Content Include="wwwroot\img\SwiftGOSFG14-72T-7516.webp" />
+    <Content Include="wwwroot\img\ThinkPadX1Carbon.webp" />
+    <Content Include="wwwroot\img\UX3405MA-0202B155H.webp" />
+    <Content Include="wwwroot\img\V14-3435-R1608BTW.webp" />
+    <Content Include="wwwroot\img\VivoBook X1404VA-0021B1335U.webp" />
+    <Content Include="wwwroot\img\Vivobook16X.webp" />
+    <Content Include="wwwroot\img\YogaBook9.webp" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.13" />
