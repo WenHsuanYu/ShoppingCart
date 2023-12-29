@@ -119,3 +119,15 @@ namespace ShoppingCartUI.Repositories
 
         public async Task<ShoppingCart?> GetShoppingCart(string userId) 
             => await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.UserId == userId);
+
+        private string? GetUserId()
+        {
+            var principal = _httpContextAccessor.HttpContext?.User;
+            if (principal is not null)
+                return _userManager.GetUserId(principal);
+            else
+                return null;
+        }
+
+    }
+}
