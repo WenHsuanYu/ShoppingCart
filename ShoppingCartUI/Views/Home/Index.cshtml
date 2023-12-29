@@ -38,10 +38,11 @@
       <div class="card mx-auto mb-4" style="width: 16rem;">
         @if (string.IsNullOrEmpty(laptop.Image))
         {
-          <img style="width:100%;height:300px" src="/img/noimage.webp" class="card-img-top" alt="...">
-        } else
+          <img style="width:100%;height:180px" src="/img/noimage.webp" class="card-img-top" alt="...">
+        } 
+        else
         {
-          <img style="width:100%;height:300px"  src="/img/@laptop.Image" class="card-img-top" alt="...">
+          <img style="width:100%;height:180px"  src="/img/@laptop.Image" class="card-img-top" alt="...">
         
         }
       
@@ -49,13 +50,13 @@
           <h5 class="card-title">@laptop.ModelName</h5>
           <p class="card-text">
             <div>
-              Brand:@laptop.BrandName
+              <b>Brand: </b>@laptop.BrandName
             </div>
             <div>
-              Processor:@laptop.Processor
+              <b>Processor: </b>@laptop.Processor
             </div>
             <div>
-              Price:@laptop.Price
+              <b>Price: </b>@laptop.Price
             </div>
           </p>
           <a href="#" class="btn btn-primary">Go somewhere</a>
