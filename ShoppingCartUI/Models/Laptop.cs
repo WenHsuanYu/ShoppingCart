@@ -18,12 +18,11 @@ namespace ShoppingCartUI.Models
         public string? Image { get; set; }
         [Required]
         public int BrandId { get; set; }
-#pragma warning disable CS8618
-        public Brand Brand { get; set; }
-        public List<CartDetail> CartDetail { get; set; }
-        public List<OrderDetail> OrderDetail { get; set; }
+        public Brand? Brand { get; set; }
+        public List<CartDetail> CartDetail { get; set; } = new List<CartDetail>();
+        public List<OrderDetail> OrderDetail { get; set; } = new List<OrderDetail>();
 
         [NotMapped]
-        public string BrandName { get; set; }
+        public required string BrandName { get; set; } 
     }
 }

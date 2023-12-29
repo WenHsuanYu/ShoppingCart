@@ -13,7 +13,7 @@ namespace ShoppingCartUI.Models
         public int LaptopId { get; set; }
         [Required]
         public int Quantity { get; set; }
-        public Laptop Laptop { get; set; }
-        public ShoppingCart ShoppingCart { get; set; }
+        public Laptop? Laptop { get; set; }
+        public ShoppingCart? ShoppingCart { get; set; }
     }
 }

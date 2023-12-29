@@ -8,13 +8,13 @@ namespace ShoppingCartUI.Models
     {
         public int Id { get; set; }
         [Required]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = new string("");
 
         public DateTime CreateDate { get; set; } = DateTime.UtcNow;
 
         public bool IsDeleted { get; set; } = false;
         public int OrderStatusId { get; set; }
-        public OrderStatus OrderStatus { get; set; }
-        public List<OrderDetail> OrderDetail { get; set; }
+        public OrderStatus OrderStatus { get; set; } = null!;
+        public List<OrderDetail> OrderDetail { get; set; } = new List<OrderDetail>();
     }
 }

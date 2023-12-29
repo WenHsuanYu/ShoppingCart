@@ -2,8 +2,8 @@
 {
     public class LaptopDTO
     {
-        public IEnumerable<Laptop> Laptops { get; set; }
-        public IEnumerable<Brand> Brands { get; set; }
+        public IEnumerable<Laptop> Laptops { get; set; } = null!;
+        public IEnumerable<Brand> Brands { get; set; } = null!;
         public string SearchText { get; set; } = "";
         public int BrandId { get; set; } = 0;
     }
