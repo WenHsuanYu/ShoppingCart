@@ -66,3 +66,56 @@ namespace ShoppingCartUI.Repositories
                 return false;
             }
         }
+
+
+        //public async Task<int> RemoveItem(int LaptopId)
+        public async Task<bool> RemoveItem(int LaptopId)
+        {
+            try
+            {
+                string? userId = GetUserId();
+                if (string.IsNullOrEmpty(userId)) {
+                    throw new Exception("The User is not logged in");
+                 
+                }   
+                var shoppingCart = await GetShoppingCart(userId) ?? throw new Exception("Invalid cart");
+                // cart items detail
+                var items = _context.CartDetails.FirstOrDefault(x => x.LaptopId == LaptopId &&
+                    x.ShoppingCartId == shoppingCart.Id) ?? throw new Exception("No items in the cart");
+                if (items.Quantity == 1)
+                {
+                    _context.CartDetails.Remove(items);
+                }
+                else
+                {
+                    items.Quantity--;
+                }
+                _context.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+            }
+            return true;
+
+        }
+        public async Task<ShoppingCart?> GetUserCart()
+        {
+            string? userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return null;
+            var shoppingCart = await _context.ShoppingCarts
+                                        .Include(x => x.CartDetails)
+                                        .ThenInclude(x => x.Laptop)
+                                        //for eager loading, x(Laptop?) should be not null here.
+                                        .ThenInclude(x => x!.Brand)
+                                        .Where(x => x.UserId == userId).FirstOrDefaultAsync();
+            
+             return shoppingCart;
+
+        }
+
+        public async Task<ShoppingCart?> GetShoppingCart(string userId) 
+            => await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.UserId == userId);
