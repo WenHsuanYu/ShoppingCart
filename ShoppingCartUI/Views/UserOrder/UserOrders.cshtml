@@ -3,7 +3,6 @@
     ViewData["Title"] = "GetUserCart";
 }
 <div class="CartDetailBody mt-2" style="width:100%">
-    <a href="/Identity/Account/Manage" class="btn btn-primary my-2">Back</a>
     <h4>My Orders</h4>
     @if (Model is not null && Model.Count() > 0)
     {
@@ -19,7 +18,7 @@
                 {
                     <tr>
                         <td>
-                            @order.CreateDate.ToString("dd-MM-yyyy")
+                            @order.CreateDate.ToString("MM-dd-yyyy")
                         </td>
                         <td>
                             @order.OrderStatus.StatusName
@@ -84,6 +83,9 @@
     {
         <h5>No Orders</h5>
     }
+    <div class="d-lg-flex justify-content-center">
+        <a href="/Identity/Account/Manage" class="btn btn-primary my-2">Back</a>
+    </div>
 </div>
 
 
