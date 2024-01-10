@@ -3,13 +3,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ShoppingCartUI.Repositories
 {
-    public class UserOrderRopository : IUserOrderRepository, IUserRepository
+    public class UserOrderRepository : IUserOrderRepository, IUserRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public UserOrderRopository(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<IdentityUser> userManager)
+        public UserOrderRepository(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _userManager = userManager;
