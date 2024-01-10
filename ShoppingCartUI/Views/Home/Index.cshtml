@@ -59,8 +59,40 @@
               <b>Price: </b>@laptop.Price
             </div>
           </p>
-          <a href="#" class="btn btn-primary">Go somewhere</a>
+          <button type="button" data-id="@laptop.Id" class="addAction btn btn-primary">Add to cart</button>
         </div>
       </div>
     }
 </div>
+
+
+
+@section Scripts {
+    <script>
+        const ele = document.querySelectorAll('.addAction');
+        ele.forEach(e => 
+        { 
+            e.addEventListener('click', () => {
+                add(e.dataset.id);
+            });
+        });
+        async function add(laptopid) {
+            const userAuthorized = @User.Identity?.IsAuthenticated.ToString().ToLower();
+            if (!userAuthorized) {
+                window.location.href = '/Identity/Account/Login';
+            }
+            try {
+                var response = await fetch(`/Cart/AddItem?laptopId=${laptopid}`);
+                if (response.status == 200) {
+                    var result = await response.json();
+                    var cartCountEl = document.getElementById('cartCount');
+                    cartCountEl.textContent = result;
+                    window.location.href = '#cartCount';
+                }
+            }
+            catch (ex) { 
+                console.log(ex);
+            }
+        }
+    </script>
+}
