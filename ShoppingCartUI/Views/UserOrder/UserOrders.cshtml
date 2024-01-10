@@ -1,0 +1,89 @@
+﻿@model IEnumerable<Order>
+@{
+    ViewData["Title"] = "GetUserCart";
+}
+<div class="CartDetailBody mt-2" style="width:100%">
+    <a href="/Identity/Account/Manage" class="btn btn-primary my-2">Back</a>
+    <h4>My Orders</h4>
+    @if (Model is not null && Model.Count() > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>OrderStatus</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>
+                            @order.CreateDate.ToString("dd-MM-yyyy")
+                        </td>
+                        <td>
+                            @order.OrderStatus.StatusName
+                        </td>
+                        
+                    </tr>
+                    @if (order.OrderDetail is not null && order.OrderDetail.Count > 0)
+                    {
+                        <tr>
+                            <td>
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Total:
+                                            </th>
+                                            <th>
+                                                @(order.OrderDetail.Select(item => item.Laptop?.Price * item.Quantity).Sum())
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>Laptop</th>
+                                            <th>Image</th>
+                                            <th>Brand</th>
+                                            <th>Unit Price</th>
+                                            <th>Quantity</th>
+                                            <th>Total Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in order.OrderDetail)
+                                        {
+                                            
+                                            <tr>
+                                                <td>@item.Laptop?.ModelName</td>
+                                                <td>
+                                                    @if (string.IsNullOrEmpty(@item.Laptop?.Image))
+                                                    {
+                                                        <img src="/img/noimage.webp" style="width:80px;height:100px" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="/img/@item.Laptop.Image" style="width:80px;height:100px" />
+                                                    }
+                                                </td>
+                                                <td>@item.Laptop?.Brand?.BrandName</td>
+                                                <td>@item.Laptop?.Price</td>
+                                                <td>@item.Quantity</td>
+                                                <td>@(item.Laptop?.Price * item.Quantity)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h5>No Orders</h5>
+    }
+</div>
+
+
