@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System.Security.Claims;
 
 namespace ShoppingCartUI.Repositories
 {
-    public class CartRepository : ICartRepository
+    public class CartRepository : ICartRepository, IUserRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -18,12 +17,15 @@ namespace ShoppingCartUI.Repositories
             _userManager = userManager;
         }
 
-        public async Task<bool> AddItem(int LaptopId, int quantity)
+        //public async Task<bool> AddItem(int laptopId, int quantity)
+        public async Task<int> AddItem(int laptopId, int quantity)
         {
             using var transaction = _context.Database.BeginTransaction();
+            string userId = ((IUserRepository)this).GetUserId(_httpContextAccessor, _userManager);
+
             try
             {
-                string? userId = GetUserId();
+                //string userId = GetUserId();
                 if (string.IsNullOrEmpty(userId))
                     throw new Exception("The User is not logged in");
 
@@ -38,7 +40,7 @@ namespace ShoppingCartUI.Repositories
                 }
                 _context.SaveChanges();
                 // cart details
-                var cartDetail = _context.CartDetails.FirstOrDefault(x => x.LaptopId == LaptopId && 
+                var cartDetail = _context.CartDetails.FirstOrDefault(x => x.LaptopId == laptopId &&
                     x.ShoppingCartId == shoppingCart.Id);
                 if (cartDetail is not null)
                 {
@@ -50,37 +52,115 @@ namespace ShoppingCartUI.Repositories
                     cartDetail = new CartDetail
                     {
                         ShoppingCartId = shoppingCart.Id,
-                        LaptopId = LaptopId,
+                        LaptopId = laptopId,
                         Quantity = quantity,
                     };
                     _context.CartDetails.Add(cartDetail);
                 }
                 _context.SaveChanges();
                 transaction.Commit();
-                return true;
-
+                //return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                //return false;
+            }
+            var cartItemCount = await GetCartItemCount(userId);
+            return cartItemCount;
+        }
+
+        public async Task<int> GetCartItemCount(string userId = "")
+        {
+            //if (!string.IsNullOrEmpty(userId))
+            //{
+            //    userId = GetUserId();
+            //}
+            var data = await (from cart in _context.ShoppingCarts
+                              join cartDetail in _context.CartDetails
+                              on cart.Id equals cartDetail.ShoppingCartId
+                              select cartDetail.Quantity
+                              ).ToListAsync();
+            return data.Count != 0 ? data.Aggregate(func: (total, next) => total + next) : 0;
+        }
+
+        public async Task<ShoppingCart?> GetShoppingCart(string userId)
+            => await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.UserId == userId);
+
+        public async Task<ShoppingCart?> GetUserCart()
+        {
+            string userId = ((IUserRepository)this).GetUserId(_httpContextAccessor, _userManager);
+            if (string.IsNullOrEmpty(userId))
+                return null;
+            var shoppingCart = await _context.ShoppingCarts
+                                        .Include(x => x.CartDetails)
+                                        .ThenInclude(x => x.Laptop)
+                                        //for eager loading, x(Laptop?) should be not null here.
+                                        .ThenInclude(x => x!.Brand)
+                                        .Where(x => x.UserId == userId).FirstOrDefaultAsync();
+
+            return shoppingCart;
+        }
+
+        public async Task<bool> GoToCheckout()
+        {
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                string userId = ((IUserRepository)this).GetUserId(_httpContextAccessor, _userManager);
+                if (string.IsNullOrEmpty(userId))
+                    throw new Exception("The User is not logged in");
+                var shoppingCart = await GetShoppingCart(userId) ?? throw new Exception("Invalid cart");
+                var cartDetails = _context.CartDetails
+                                        .Where(x => x.ShoppingCartId == shoppingCart.Id)
+                                        .Include(x => x.Laptop).ToList();
+                if (cartDetails.Count == 0)
+                    throw new Exception("No items in the cart");
+                var Order = new Order
+                {
+                    UserId = userId,
+                    CreateDate = DateTime.UtcNow,
+                    OrderStatusId = 1,
+                };
+                _context.Orders.Add(Order);
+                _context.SaveChanges();
+                foreach (var item in cartDetails)
+                {
+                    var OrderDetail = new OrderDetail
+                    {
+                        OrderId = Order.Id,
+                        LaptopId = item.LaptopId,
+                        Quantity = item.Quantity,
+                        UnitPrice = item.Laptop!.Price
+                    };
+                    _context.OrderDetails.Add(OrderDetail);
+                }
+                _context.SaveChanges();
+                _context.CartDetails.RemoveRange(cartDetails);
+                _context.SaveChanges();
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 return false;
             }
         }
 
-
-        //public async Task<int> RemoveItem(int LaptopId)
-        public async Task<bool> RemoveItem(int LaptopId)
+        public async Task<int> RemoveItem(int laptopId)
         {
+            string userId = ((IUserRepository)this).GetUserId(_httpContextAccessor, _userManager);
             try
             {
-                string? userId = GetUserId();
-                if (string.IsNullOrEmpty(userId)) {
+                //string userId = GetUserId();
+                if (string.IsNullOrEmpty(userId))
+                {
                     throw new Exception("The User is not logged in");
-                 
-                }   
+                }
                 var shoppingCart = await GetShoppingCart(userId) ?? throw new Exception("Invalid cart");
                 // cart items detail
-                var items = _context.CartDetails.FirstOrDefault(x => x.LaptopId == LaptopId &&
+                var items = _context.CartDetails.FirstOrDefault(x => x.LaptopId == laptopId &&
                     x.ShoppingCartId == shoppingCart.Id) ?? throw new Exception("No items in the cart");
                 if (items.Quantity == 1)
                 {
@@ -91,43 +171,15 @@ namespace ShoppingCartUI.Repositories
                     items.Quantity--;
                 }
                 _context.SaveChanges();
-
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                return false;
+                //return false;
             }
-            return true;
-
+            //return true;
+            var cartItemCount = await GetCartItemCount(userId);
+            return cartItemCount;
         }
-        public async Task<ShoppingCart?> GetUserCart()
-        {
-            string? userId = GetUserId();
-            if (string.IsNullOrEmpty(userId))
-                return null;
-            var shoppingCart = await _context.ShoppingCarts
-                                        .Include(x => x.CartDetails)
-                                        .ThenInclude(x => x.Laptop)
-                                        //for eager loading, x(Laptop?) should be not null here.
-                                        .ThenInclude(x => x!.Brand)
-                                        .Where(x => x.UserId == userId).FirstOrDefaultAsync();
-            
-             return shoppingCart;
-
-        }
-
-        public async Task<ShoppingCart?> GetShoppingCart(string userId) 
-            => await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.UserId == userId);
-
-        private string? GetUserId()
-        {
-            var principal = _httpContextAccessor.HttpContext?.User;
-            if (principal is not null)
-                return _userManager.GetUserId(principal);
-            else
-                return null;
-        }
-
     }
 }
