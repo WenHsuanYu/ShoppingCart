@@ -2,3 +2,4 @@
 global using ShoppingCartUI.Models;
 global using ShoppingCartUI.Repositories;
 global using ShoppingCartUI.Models.DTOs;
+global using System.Globalization;
