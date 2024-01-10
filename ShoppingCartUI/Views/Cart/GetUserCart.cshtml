@@ -1,0 +1,65 @@
+﻿@model ShoppingCart
+@{
+    ViewData["Title"] = "GetUserCart";
+}
+<div class="CartDetailBody mt-2">
+    @if (Model is not null && Model.CartDetails is not null && Model.CartDetails.Count > 0)
+    {
+        <h5>My Cart</h5>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Laptop</th>
+                    <th>Image</th>
+                    <th>Brand</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Action</th>   
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.CartDetails)
+                {
+                    <tr>
+                        <td>@item.Laptop?.ModelName</td>
+                        <td>
+                            @if (string.IsNullOrEmpty(@item.Laptop?.Image))
+                            {
+                                <img src="/img/noimage.webp" style="width:80px;height:100px" />
+                            }
+                            else
+                            {
+                                <img src="/img/@item.Laptop.Image" style="width:80px;height:100px" />
+                            }
+                        </td>
+                        <td>@item.Laptop?.Brand?.BrandName</td>
+                        <td>@item.Laptop?.Price</td>
+                        <td>@item.Quantity</td>
+                        <td>@(item.Laptop?.Price * item.Quantity)</td>
+                        <td>
+                            <a class="btn btn-info" href="/Cart/AddItem?LaptopId=@item.LaptopId&&redirect=1">+</a>
+                            <a class="btn btn-info" href="/Cart/RemoveItem?LaptopId=@item.LaptopId">-</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>    
+        </table>
+        <div class="my-2">
+            <div style="text-align:right">
+                <b>Total(NTD) </b><span class="bi bi-currency-dollar"><b>@(Model.CartDetails.Select(item => item.Laptop?.Price * item.Quantity).Sum())</b></span>
+            </div>
+        </div>
+        <div class="d-flex flex-row my-2 justify-content-end">
+            <a class="btn btn-primary" href="/Cart/GoToCheckout">Checkout</a>
+        </div>
+
+    }
+    else
+    {
+        <h5>Your cart is empty</h5>
+    }
+</div>
+
+
