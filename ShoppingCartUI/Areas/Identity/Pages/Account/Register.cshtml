@@ -7,7 +7,7 @@
 <h1>@ViewData["Title"]</h1>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <h2>Create a new account.</h2>
             <hr />
@@ -30,8 +30,8 @@
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
+    <div class="col-md-5 col-md-offset-2">
+        <section style="text-align:center">
             <h3>Use another service to register.</h3>
             <hr />
             @{
@@ -47,7 +47,7 @@
                 else
                 {
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
+                        <div class="d-md-flex flex-row justify-content-center">
                             <p>
                                 @foreach (var provider in Model.ExternalLogins!)
                                 {
