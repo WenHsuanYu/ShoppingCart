@@ -42,3 +42,17 @@ body {
     width: 100%;
     height: 2rem;
 }
+
+.items::after {
+    content: attr(data-value);
+    font-size: 14px;
+    color: #0952cc;
+    background: red;
+    border-radius: 15px;
+    padding: 2px 2px;
+    position: relative;
+    left: -17px;
+    top: -15px;
+    opacity: 0.9;
+    font-style: normal;
+}
