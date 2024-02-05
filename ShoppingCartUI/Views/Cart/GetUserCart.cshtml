@@ -39,8 +39,8 @@
                         <td>@item.Quantity</td>
                         <td>@(item.Laptop?.Price * item.Quantity)</td>
                         <td>
-                            <a class="btn btn-info" href="/Cart/AddItem?LaptopId=@item.LaptopId&&redirect=1">+</a>
-                            <a class="btn btn-info" href="/Cart/RemoveItem?LaptopId=@item.LaptopId">-</a>
+                            <a class="btn btn-info" href="/Cart/AddItem?LaptopId=@item.LaptopId&&redirect=1"><i class="bi bi-arrow-up"></i></a>
+                            <a class="btn btn-info" href="/Cart/RemoveItem?LaptopId=@item.LaptopId"><i class="bi bi-arrow-down"></i></a>
                         </td>
                     </tr>
                 }

@@ -6,78 +6,81 @@
     <h4>My Orders</h4>
     @if (Model is not null && Model.Count() > 0)
     {
-        <table class="table table-striped">
+        <div class="container shadow min-vh-100 py-2">
+        <div class="table-responsive">
+            <table class="table table-striped accordion">
             <thead>
                 <tr>
-                    <th>Order</th>
-                    <th>OrderStatus</th>
+                    <th scope="col">Order</th>
+                    <th scope="col">OrderStatus</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var order in Model)
-                {
-                    <tr>
-                        <td>
-                            @order.CreateDate.ToString("MM-dd-yyyy")
-                        </td>
-                        <td>
-                            @order.OrderStatus.StatusName
-                        </td>
-                        
-                    </tr>
-                    @if (order.OrderDetail is not null && order.OrderDetail.Count > 0)
                     {
-                        <tr>
+                        <tr data-bs-toggle="collapse" data-bs-target="#r@(order.Id)">
                             <td>
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                Total:
-                                            </th>
-                                            <th>
-                                                @(order.OrderDetail.Select(item => item.Laptop?.Price * item.Quantity).Sum())
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th>Laptop</th>
-                                            <th>Image</th>
-                                            <th>Brand</th>
-                                            <th>Unit Price</th>
-                                            <th>Quantity</th>
-                                            <th>Total Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in order.OrderDetail)
-                                        {
-                                            
+                                @order.CreateDate.ToString("MM-dd-yyyy")
+                            </td>
+                            <td>
+                                @order.OrderStatus.StatusName <i class="bi bi-chevron-down"></i>
+                            </td>
+                        </tr>
+                        @if (order.OrderDetail is not null && order.OrderDetail.Count > 0)
+                        {
+                            <tr class="collapse accordion-collapse" id="r@(order.Id)">
+                                <td>
+                                    <table class="table table-striped table-bordered" style="text-align:center;">
+                                        <thead>
+                                            <tr>
+                                                <th>Laptop</th>
+                                                <th>Image</th>
+                                                <th>Brand</th>
+                                                <th>Unit Price</th>
+                                                <th>Quantity</th>
+                                                <th>Total Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in order.OrderDetail)
+                                            {
+
                                             <tr>
                                                 <td>@item.Laptop?.ModelName</td>
                                                 <td>
-                                                    @if (string.IsNullOrEmpty(@item.Laptop?.Image))
-                                                    {
+                                                        @if (string.IsNullOrEmpty(@item.Laptop?.Image))
+                                                        {
                                                         <img src="/img/noimage.webp" style="width:80px;height:100px" />
-                                                    }
-                                                    else
-                                                    {
+                                                        }
+                                                        else
+                                                        {
                                                         <img src="/img/@item.Laptop.Image" style="width:80px;height:100px" />
-                                                    }
+                                                        }
                                                 </td>
                                                 <td>@item.Laptop?.Brand?.BrandName</td>
                                                 <td>@item.Laptop?.Price</td>
                                                 <td>@item.Quantity</td>
                                                 <td>@(item.Laptop?.Price * item.Quantity)</td>
                                             </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
+                                            }
+                                            <tr>
+                                                <td colspan="5" style="text-align:right;">
+                                                    Total:
+                                                </td>
+                                                <td>
+                                                    @(order.OrderDetail.Select(item => item.Laptop?.Price * item.Quantity).Sum())
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        }
                     }
-                }
             </tbody>
         </table>
+        </div>
+        </div>
     }
     else
     {
