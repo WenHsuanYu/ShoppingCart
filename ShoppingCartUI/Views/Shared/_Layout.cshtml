@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,7 +14,7 @@
     @* <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" /> *@
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg bg-primary py-0" data-bs-theme="dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/Home/Index">Laptop Store</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +29,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Home/Privacy" >Privacy</a>
+                        <a class="nav-link active" href="/Home/Privacy" >Privacy</a>
                     </li>
                 </ul>
                 <partial name="_LoginPartial" />
@@ -49,22 +51,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script>
-        loadCartCount();
-        async function loadCartCount() {
-            try {
-                var response = await fetch(`/Cart/GetTotalItemInCart`);
-                if (response.status == 200) {
-                    var result = await response.json();
-                    var cartCountEl = document.getElementById('cartCount');
-                    cartCountEl.textContent = result;
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <script>
+            loadCartCount();
+            async function loadCartCount() {
+                try {
+                    var response = await fetch(`/Cart/GetTotalItemInCart`);
+                    if (response.status == 200) {
+                        var result = await response.json();
+                        var cartCountEl = document.querySelector('i[data-value]');
+                        cartCountEl.dataset.value = result;
+                    }
+                }
+                catch (ex) {
+                    console.log(ex);
                 }
             }
-            catch (ex) {
-                console.log(ex);
-            }
-        }
-    </script>
+        </script>
+    }
 </body>
 </html>
 @await RenderSectionAsync("Scripts", required: false)
