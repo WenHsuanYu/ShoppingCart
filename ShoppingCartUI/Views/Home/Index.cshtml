@@ -33,6 +33,7 @@
 </div>
 
 <div class="w-100 d-flex flex-wrap mt-4">
+
     @foreach (var laptop in Model.Laptops)
     {
       <div class="card mx-auto mb-4" style="width: 16rem;">
@@ -67,8 +68,6 @@
     }
 </div>
 
-
-
 @section Scripts {
     <script>
         const ele = document.querySelectorAll('.addAction');
@@ -87,8 +86,8 @@
                 var response = await fetch(`/Cart/AddItem?laptopId=${laptopid}`);
                 if (response.status == 200) {
                     var result = await response.json();
-                    var cartCountEl = document.getElementById('cartCount');
-                    cartCountEl.textContent = result;
+                    var cartCountEl = document.querySelector("i[data-value]");//document.getElementById('cartCount');
+                    cartCountEl.dataset.value = result;
                     window.location.href = '#cartCount';
                 }
             }
