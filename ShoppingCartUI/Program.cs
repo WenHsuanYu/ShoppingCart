@@ -1,5 +1,12 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
+using ShoppingCartUI.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,10 +20,41 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.Sign
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI()
     .AddDefaultTokenProviders();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+});
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    })
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+        options.SlidingExpiration = true;
+        options.LoginPath = new PathString("/Account/Login");
+        options.LogoutPath = new PathString("/Account/Logout");
+        options.AccessDeniedPath = new PathString("/Account/AccessDenied");
+    })
+    .AddGoogle(options =>
+    {
+        //Options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    });
+
 builder.Services.AddTransient<IHomeRepository, HomeRepository>();
 builder.Services.AddTransient<ICartRepository, CartRepository>();
 builder.Services.AddTransient<IUserOrderRepository, UserOrderRepository>();
+
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.FromMinutes(15);
+});
 
 var app = builder.Build();
 //using (var scope = app.Services.CreateScope())
@@ -40,7 +78,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
