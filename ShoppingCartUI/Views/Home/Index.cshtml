@@ -1,8 +1,10 @@
-﻿
-@model LaptopDTO
+﻿@model LaptopDTO
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "Laptop store";
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
+<input id="RequestVerificationToken" type="hidden" value="@requestToken" />
 
 <div class="my-2">
 <form asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
@@ -71,29 +73,15 @@
 @section Scripts {
     <script>
         const ele = document.querySelectorAll('.addAction');
+        let userAuthorized = @User.Identity?.IsAuthenticated.ToString().ToLower();
+        // alert(userAuthorized);
         ele.forEach(e => 
-        { 
+        {
             e.addEventListener('click', () => {
-                add(e.dataset.id);
+                add(e.dataset.id, undefined, userAuthorized);
             });
         });
-        async function add(laptopid) {
-            const userAuthorized = @User.Identity?.IsAuthenticated.ToString().ToLower();
-            if (!userAuthorized) {
-                window.location.href = '/Identity/Account/Login';
-            }
-            try {
-                var response = await fetch(`/Cart/AddItem?laptopId=${laptopid}`);
-                if (response.status == 200) {
-                    var result = await response.json();
-                    var cartCountEl = document.querySelector("i[data-value]");//document.getElementById('cartCount');
-                    cartCountEl.dataset.value = result;
-                    window.location.href = '#cartCount';
-                }
-            }
-            catch (ex) { 
-                console.log(ex);
-            }
-        }
+        
     </script>
 }
+

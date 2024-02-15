@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ShoppingCartUI.Controllers
 {
@@ -13,10 +14,11 @@ namespace ShoppingCartUI.Controllers
             _CartRepository = cartRepository;
         }
 
-        public async Task<IActionResult> AddItem(int laptopId, int quantity = 1, int redirect = 0)
+        [HttpPost]
+        public async Task<IActionResult> AddItem([Bind("LaptopId, Redirect"), FromBody] ItemRequest request)
         {
-            var cartCount = await _CartRepository.AddItem(laptopId, quantity);
-            if (redirect == 0)
+            var cartCount = await _CartRepository.AddItem(request.LaptopId, request.Quantity);
+            if (request.Redirect == 0)
             {
                 return Ok(cartCount);
             }
@@ -36,19 +38,29 @@ namespace ShoppingCartUI.Controllers
             return View(cart);
         }
 
+        [HttpPost]
         public async Task<IActionResult> GoToCheckout()
         {
             var isCheckedOut = await _CartRepository.GoToCheckout();
             if (!isCheckedOut)
                 return StatusCode(500);
-            return RedirectToAction("Index", "Home");
+            //return RedirectToAction("Index", "Home");
+            return Ok();
         }
 
-        public async Task<IActionResult> RemoveItem(int laptopId)
+        [HttpDelete]
+        public async Task<IActionResult> RemoveItem([Bind("LaptopId"), FromBody] ItemRequest request)
         {
             //var cartCount =
-            await _CartRepository.RemoveItem(laptopId);
+            await _CartRepository.RemoveItem(request.LaptopId);
             return RedirectToAction("GetUserCart");
         }
+    }
+
+    public class ItemRequest
+    {
+        public int LaptopId { get; set; }
+        public int Quantity { get; set; } = 1;
+        public int Redirect { get; set; } = 0;
     }
 }
