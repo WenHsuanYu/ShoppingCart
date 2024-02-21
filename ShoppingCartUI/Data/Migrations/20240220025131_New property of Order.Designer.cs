@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShoppingCartUI.Data;
 
@@ -11,9 +12,11 @@ using ShoppingCartUI.Data;
 namespace ShoppingCartUI.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240220025131_New property of Order")]
+    partial class NewpropertyofOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,7 +238,7 @@ namespace ShoppingCartUI.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brand", (string)null);
+                    b.ToTable("Brand");
                 });
 
             modelBuilder.Entity("ShoppingCartUI.Models.CartDetail", b =>
@@ -261,7 +264,7 @@ namespace ShoppingCartUI.Data.Migrations
 
                     b.HasIndex("ShoppingCartId");
 
-                    b.ToTable("CartDetail", (string)null);
+                    b.ToTable("CartDetail");
                 });
 
             modelBuilder.Entity("ShoppingCartUI.Models.Laptop", b =>
@@ -294,7 +297,7 @@ namespace ShoppingCartUI.Data.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("Laptop", (string)null);
+                    b.ToTable("Laptop");
                 });
 
             modelBuilder.Entity("ShoppingCartUI.Models.Order", b =>
@@ -317,9 +320,6 @@ namespace ShoppingCartUI.Data.Migrations
                     b.Property<int>("OrderStatusId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -328,7 +328,7 @@ namespace ShoppingCartUI.Data.Migrations
 
                     b.HasIndex("OrderStatusId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("ShoppingCartUI.Models.OrderDetail", b =>
@@ -357,7 +357,7 @@ namespace ShoppingCartUI.Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderDetail", (string)null);
+                    b.ToTable("OrderDetail");
                 });
 
             modelBuilder.Entity("ShoppingCartUI.Models.OrderStatus", b =>
@@ -378,7 +378,7 @@ namespace ShoppingCartUI.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrderStatus", (string)null);
+                    b.ToTable("OrderStatus");
                 });
 
             modelBuilder.Entity("ShoppingCartUI.Models.ShoppingCart", b =>
@@ -398,7 +398,7 @@ namespace ShoppingCartUI.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShoppingCart", (string)null);
+                    b.ToTable("ShoppingCart");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
