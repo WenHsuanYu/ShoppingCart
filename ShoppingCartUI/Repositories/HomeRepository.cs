@@ -18,7 +18,7 @@ namespace ShoppingCartUI.Repositories
                                                  select new Laptop
                                                  {
                                                      Id = Laptop.Id,
-                                                     Image = Laptop.Image,
+                                                     ImageFileName = Laptop.ImageFileName,
                                                      ModelName = Laptop.ModelName,
                                                      Processor = Laptop.Processor,
                                                      Price = Laptop.Price,
