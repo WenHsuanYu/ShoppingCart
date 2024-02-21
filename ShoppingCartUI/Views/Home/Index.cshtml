@@ -39,13 +39,13 @@
     @foreach (var laptop in Model.Laptops)
     {
       <div class="card mx-auto mb-4" style="width: 16rem;">
-        @if (string.IsNullOrEmpty(laptop.Image))
+        @if (string.IsNullOrEmpty(laptop.ImageFileName))
         {
           <img style="width:100%;height:180px" src="/img/noimage.webp" class="card-img-top" alt="...">
         } 
         else
         {
-          <img style="width:100%;height:180px"  src="/img/@laptop.Image" class="card-img-top" alt="...">
+          <img style="width:100%;height:180px"  src="/img/@laptop.ImageFileName" class="card-img-top" alt="...">
         
         }
       

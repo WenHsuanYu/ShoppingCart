@@ -48,13 +48,13 @@
                                             <tr>
                                                 <td>@item.Laptop?.ModelName</td>
                                                 <td>
-                                                        @if (string.IsNullOrEmpty(@item.Laptop?.Image))
+                                                        @if (string.IsNullOrEmpty(@item.Laptop?.ImageFileName))
                                                         {
                                                         <img src="/img/noimage.webp" style="width:80px;height:100px" />
                                                         }
                                                         else
                                                         {
-                                                        <img src="/img/@item.Laptop.Image" style="width:80px;height:100px" />
+                                                        <img src="/img/@item.Laptop.ImageFileName" style="width:80px;height:100px" />
                                                         }
                                                 </td>
                                                 <td>@item.Laptop?.Brand?.BrandName</td>
