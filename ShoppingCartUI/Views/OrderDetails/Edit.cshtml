@@ -1,0 +1,72 @@
+﻿@model IList<ShoppingCartUI.Models.OrderDetail>
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>OrderDetail</h4>
+<hr />
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 container">
+            <form asp-action="Edit" class="row">
+                @* <div asp-validation-summary="ModelOnly" class="text-danger"></div> *@
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    //var item = list.ElementAt(i);
+                    @Html.HiddenFor(model => model[i].Id)
+                    @* <input type="hidden" id="Id" name="Id" value="@item.Id" /> *@
+                    <div class="form-group">
+                        @Html.LabelFor(model => model[i].OrderId, htmlAttributes: new { @class = "control-label" })
+                        @Html.DropDownListFor(model => model[i].OrderId, ViewBag.Order[i] as SelectList, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model[i].OrderId, "", new { @class = "text-danger" })
+                        @* <label for="OrderId" class="control-label">Order Id</label> *@
+                        @* <select name="OrderId" class="form-control" asp-items="ViewBag.Order[i]"></select> *@
+                        @* <span asp-validation-for="@item.OrderId" class="text-danger"></span> *@
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model[i].LaptopId, htmlAttributes: new { @class = "control-label" })
+                        @Html.DropDownListFor(model => model[i].LaptopId, ViewBag.Laptop[i] as SelectList, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model[i].LaptopId, "", new { @class = "text-danger" })
+                        @* <label for="LaptopId" class="control-label">Laptop Id</label> *@
+                        @* <select name="LaptopId" class="form-control" asp-items="ViewBag.Laptop[i]"></select> *@
+                        @* <span asp-validation-for="@item.LaptopId" class="text-danger"></span> *@
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model[i].Quantity, htmlAttributes: new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model[i].Quantity, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model[i].Quantity, "", new { @class = "text-danger" })
+                        @* <label for="Quantity" class="control-label"></label> *@
+                        @* <input name="Quantity" id="Quantity" class="form-control" value="@item.Quantity"/> *@
+                        @* <span asp-validation-for="@item.Quantity" class="text-danger"></span> *@
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model[i].UnitPrice, htmlAttributes: new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model[i].UnitPrice, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model[i].UnitPrice, "", new { @class = "text-danger" })
+                        @* <label for="UnitPrice" class="control-label"></label> *@
+                        @* <input name="UnitPrice" id="UnitPrice" value="@item.UnitPrice" class="form-control" /> *@
+                        @* <span asp-validation-for="@item.UnitPrice" class="text-danger"></span> *@
+                    </div>
+                    @* <div class="form-group">
+                        @Html.LabelFor(model => model[i].StatusName, htmlAttributes: new { @class = "control-label" })
+                        @Html.DropDownListFor(model => model[i].StatusName, ViewBag.Status[i] as SelectList, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model[i].OrderId, "", new { @class = "text-danger" })
+                    </div> *@
+                    <hr />
+                }
+                <div class="form-group text-center">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="text-center">
+    <a asp-action="Index">Back to List</a>
+</div>
+
+

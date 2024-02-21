@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ShoppingCartUI.Models.OrderDetail>
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>OrderDetail</h4>
+    <hr />
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Laptop)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UnitPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Order!.OrderStatus!.StatusName)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Laptop!.ModelName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UnitPrice)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Quantity)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Order!.OrderStatus!.StatusName)
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    @{
+        var order = Model.FirstOrDefault()?.Order?.OrderStatus?.StatusName;
+        if (order != "Shipped")
+        {
+            <a asp-action="Edit" asp-route-orderId="@Model.FirstOrDefault()?.OrderId">Edit</a>
+            <span> | </span>
+        }
+    }<a asp-action="Index">Back to List</a>
+</div>

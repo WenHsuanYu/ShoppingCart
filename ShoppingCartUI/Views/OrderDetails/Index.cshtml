@@ -1,0 +1,74 @@
+﻿@model IEnumerable<ShoppingCartUI.Models.OrderDetail>
+
+@{
+    ViewData["Title"] = "Order";
+}
+
+<h1 class="my-2">@ViewData["Title"] List</h1>
+
+@* <p>
+    <a asp-action="Create">Create New</a>
+</p> *@
+<table class="table">
+    <thead>
+        <tr>
+            @* <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitPrice)
+            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.Order)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order.CreateDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order.Email)
+            </th>
+            @* <th>
+                @Html.DisplayNameFor(model => model.Laptop)
+            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.Order!.Status)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @{
+        var Orders = Model.DistinctBy(x => x.OrderId).ToList();
+        foreach (var item in Orders) {
+                <tr>
+                    @* <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UnitPrice)
+                    </td> *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Order.CreateDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Order.Email)
+                    </td>
+                    @*<td>
+                        @Html.DisplayFor(modelItem => item.Laptop.ModelName)
+                    </td> *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Order!.Status)
+                    </td>
+                    <td>
+                        <a asp-action="EditOrder" asp-route-orderId="@item.OrderId">Edit</a> |
+                        <a asp-action="Details" asp-route-orderId="@item.OrderId">Details</a> |
+                        <a asp-action="Delete" asp-route-orderId="@item.OrderId">Delete</a>
+                    </td>
+                </tr>
+        }
+    }
+    </tbody>
+</table>
