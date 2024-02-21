@@ -121,6 +121,8 @@ namespace ShoppingCartUI.Repositories
                     UserId = userId,
                     CreateDate = DateTime.UtcNow,
                     OrderStatusId = 1,
+                    Status = "Pending",
+                    Email = _userManager.Users.FirstOrDefault(x => x.Id == userId)!.Email,
                 };
                 _context.Orders.Add(Order);
                 _context.SaveChanges();
