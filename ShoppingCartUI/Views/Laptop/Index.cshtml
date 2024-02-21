@@ -1,0 +1,68 @@
+﻿@model IEnumerable<ShoppingCartUI.Models.Laptop>
+
+@{
+    ViewData["Title"] = "Laptop";
+    // CultureInfo cultureInfo = new CultureInfo("zh-TW");
+}
+
+<h1 class="my-2">@ViewData["Title"] List</h1>
+
+<p class="text-center">
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ImageFileName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ModelName)
+                
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Processor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Brand)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @if (string.IsNullOrEmpty(item.ImageFileName))
+                {
+                    <img style="width:80px;height:100px" src="/img/noimage.webp" class="card-img-top" alt="...">
+                }
+                else
+                {
+                    <img style="width:80px;height:100px" src="/img/@item.ImageFileName" class="card-img-top" alt="...">
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ModelName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Processor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Brand.BrandName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
