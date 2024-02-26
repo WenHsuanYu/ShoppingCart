@@ -42,7 +42,28 @@
                 }
                 else
                 {
-                    <img style="width:80px;height:100px" src="/img/@item.ImageFileName" class="card-img-top" alt="...">
+                    @* var path = Directory.GetCurrentDirectory();
+                    path = System.IO.Path.Combine(path, "img");
+                    if (File.Exists($"wwwroot/img/{item.ImageFileName}"))
+                    {
+                        <img style="width:80px;height:100px" src="/img/@item.ImageFileName" class="card-img-top" alt="...">
+                    }
+                    else
+                    {
+                        <img style="width:80px;height:100px" src="@item.ImageUrl.Url" class="card-img-top" alt="...">
+                    } *@
+                    if (System.IO.Path.Exists($"wwwroot/img/{item.ImageFileName}"))
+                    {
+                        <img style="width:80px;height:100px" src="/img/@item.ImageFileName" class="card-img-top" alt="..."> 
+                    } 
+                    else if (System.IO.Path.Exists($"wwwroot/uploadedimg/{item.ImageFileName}"))
+                    {
+                        <img style="width:80px;height:100px" src="/uploadedimg/@item.ImageFileName" class="card-img-top" alt="..."> 
+                    }
+                    else
+                    {
+                        <img style="width:80px;height:100px" src="@item.ImageUrl.Url" class="card-img-top" alt="..."> 
+                    }
                 }
             </td>
             <td>

@@ -50,14 +50,26 @@
                                                 <td>
                                                         @if (string.IsNullOrEmpty(@item.Laptop?.ImageFileName))
                                                         {
-                                                        <img src="/img/noimage.webp" style="width:80px;height:100px" />
+                                                                <img src="/img/noimage.webp" style="width:80px;height:100px" />
                                                         }
                                                         else
                                                         {
-                                                        <img src="/img/@item.Laptop.ImageFileName" style="width:80px;height:100px" />
+                                                            if (System.IO.Path.Exists($"wwwroot/img/{item.Laptop.ImageFileName}"))
+                                                            {
+                                                                <img src="/img/@item.Laptop.ImageFileName" style="width:80px;height:100px" alt="..."/>
+                                                            }
+                                                            else if (System.IO.Path.Exists($"wwwroot/uploadedimg/{item.Laptop.ImageFileName}"))
+                                                            {
+                                                                <img src="/uploadedimg/@item.Laptop.ImageFileName" style="width:80px;height:100px" alt="..."/>
+                                                            }
+                                                            else
+                                                            {
+                                                                <img src="@item?.Laptop?.ImageUrl?.Url" style="width:80px;height:100px" alt="..."/>
+                                                            }
+
                                                         }
                                                 </td>
-                                                <td>@item.Laptop?.Brand?.BrandName</td>
+                                                <td>@item!.Laptop?.Brand?.BrandName</td>
                                                 <td>@item.Laptop?.Price</td>
                                                 <td>@item.Quantity</td>
                                                 <td>@(item.Laptop?.Price * item.Quantity)</td>

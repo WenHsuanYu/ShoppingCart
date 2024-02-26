@@ -34,7 +34,26 @@
                             }
                             else
                             {
-                                <img src="/img/@item.Laptop.ImageFileName" style="width:80px;height:100px" />
+@*                                 if (File.Exists($"wwwroot/img/{item.Laptop?.ImageFileName}"))
+                                {
+                                    <img style="width:80px;height:100px" src="/img/@item.Laptop!.ImageFileName">
+                                }
+                                else
+                                {
+                                    <img style="width:80px;height:100px" src="@item.Laptop.ImageUrl.Url">
+                                } *@
+                                if (System.IO.Path.Exists($"wwwroot/img/{item.Laptop.ImageFileName}"))
+                                {
+                                    <img style="width:80px;height:100px" src="/img/@item.Laptop.ImageFileName" alt="...">
+                                }
+                                else if (System.IO.Path.Exists($"wwwroot/uploadedimg/{item.Laptop.ImageFileName}"))
+                                {
+                                    <img style="width:80px;height:100px" src="/uploadedimg/@item.Laptop.ImageFileName" alt="...">
+                                }
+                                else
+                                {
+                                    <img style="width:80px;height:100px" src="@item?.Laptop?.ImageUrl?.Url" alt="...">
+                                }
                             }
                         </td>
                         <td>@item.Laptop?.Brand?.BrandName</td>
