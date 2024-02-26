@@ -11,7 +11,7 @@ namespace ShoppingCartUI.Repositories
         public async Task<IEnumerable<Laptop>> GetLaptopsAsync(string searchText = "", int BrandId = 0)
         {
             searchText = searchText.ToLower();
-            IEnumerable<Laptop> Laptops = await (from Laptop in _dbcontext.Laptops
+            IEnumerable<Laptop> Laptops = await (from Laptop in _dbcontext.Laptops.Include("ImageUrl")
                                                  join Brand in _dbcontext.Brands
                                                  on Laptop.BrandId equals Brand.Id
                                                  where string.IsNullOrWhiteSpace(searchText) || (Laptop != null && Laptop.ModelName.ToLower().StartsWith(searchText))
@@ -23,7 +23,8 @@ namespace ShoppingCartUI.Repositories
                                                      Processor = Laptop.Processor,
                                                      Price = Laptop.Price,
                                                      BrandId = Laptop.BrandId,
-                                                     BrandName = Brand.BrandName
+                                                     BrandName = Brand.BrandName,
+                                                     ImageUrl = Laptop.ImageUrl
                                                  }
                           ).ToListAsync();
             if (BrandId > 0)
