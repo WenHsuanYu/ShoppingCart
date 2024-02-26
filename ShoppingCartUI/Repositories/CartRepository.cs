@@ -9,14 +9,15 @@ namespace ShoppingCartUI.Repositories
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
-
+        #region ctor
         public CartRepository(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
         }
-
+        #endregion
+        #region AddItem
         //public async Task<bool> AddItem(int laptopId, int quantity)
         public async Task<int> AddItem(int laptopId, int quantity)
         {
@@ -69,7 +70,8 @@ namespace ShoppingCartUI.Repositories
             var cartItemCount = await GetCartItemCount(userId);
             return cartItemCount;
         }
-
+        #endregion
+        #region GetCartItemCount
         public async Task<int> GetCartItemCount(string userId = "")
         {
             //if (!string.IsNullOrEmpty(userId))
@@ -83,25 +85,32 @@ namespace ShoppingCartUI.Repositories
                               ).ToListAsync();
             return data.Count != 0 ? data.Aggregate(func: (total, next) => total + next) : 0;
         }
-
+        #endregion
+        #region GetShoppingCart
         public async Task<ShoppingCart?> GetShoppingCart(string userId)
             => await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.UserId == userId);
-
+        #endregion
+        #region GetUserCart
         public async Task<ShoppingCart?> GetUserCart()
         {
             string userId = ((IUserRepository)this).GetUserId(_httpContextAccessor, _userManager);
             if (string.IsNullOrEmpty(userId))
                 return null;
             var shoppingCart = await _context.ShoppingCarts
-                                        .Include(x => x.CartDetails)
-                                        .ThenInclude(x => x.Laptop)
+                                        .Include(sc => sc.CartDetails)
+                                        .ThenInclude(cd => cd.Laptop)
                                         //for eager loading, x(Laptop?) should be not null here.
-                                        .ThenInclude(x => x!.Brand)
-                                        .Where(x => x.UserId == userId).FirstOrDefaultAsync();
+                                        .ThenInclude(l => l!.ImageUrl)
+                                        .Include(sc => sc.CartDetails)
+                                        .ThenInclude(cd => cd.Laptop)
+                                        .ThenInclude(l => l!.Brand)
+                                        .Where(sc => sc.UserId == userId)
+                                        .FirstOrDefaultAsync();
 
             return shoppingCart;
         }
-
+        #endregion
+        #region GoToCheckout
         public async Task<bool> GoToCheckout()
         {
             using var transaction = _context.Database.BeginTransaction();
@@ -149,7 +158,8 @@ namespace ShoppingCartUI.Repositories
                 return false;
             }
         }
-
+        #endregion
+        #region RemoveItem
         public async Task<int> RemoveItem(int laptopId)
         {
             string userId = ((IUserRepository)this).GetUserId(_httpContextAccessor, _userManager);
@@ -183,5 +193,6 @@ namespace ShoppingCartUI.Repositories
             var cartItemCount = await GetCartItemCount(userId);
             return cartItemCount;
         }
+        #endregion
     }
 }
