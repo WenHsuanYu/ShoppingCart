@@ -51,11 +51,16 @@
                             <p>
                                 @foreach (var provider in Model.ExternalLogins!)
                                 {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                    <button type="submit" class="btn btn-light" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                        <img style="width: 24px;height: 24px" src="https://www.svgrepo.com/show/475656/google-color.svg" loading="lazy" alt="google logo">
+                                        <span>Register</span>
+                                    </button>
                                 }
                             </p>
                         </div>
                     </form>
+
+                    <p class="text-warning fw-bold">Only testers can sign up using Google</p>
                 }
             }
         </section>
