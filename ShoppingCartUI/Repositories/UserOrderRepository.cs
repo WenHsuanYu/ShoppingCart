@@ -26,6 +26,9 @@ namespace ShoppingCartUI.Repositories
                                        .Include(x => x.OrderStatus)
                                        .Include(x => x.OrderDetail)
                                        .ThenInclude(x => x.Laptop)
+                                       .ThenInclude(x => x!.ImageUrl)
+                                       .Include(x => x.OrderDetail)
+                                       .ThenInclude(x => x.Laptop)
                                        .ThenInclude(x => x!.Brand)
                                        .Where(x => x.UserId == userId)
                                        .ToListAsync();
