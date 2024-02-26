@@ -39,5 +39,7 @@ namespace ShoppingCartUI.Models
         [MaxFileSize(3 * 1024 * 1024)]
         [AllowedExtensions(new string[] { ".jpg", ".png", ".jpeg", ".webp" })]
         public IFormFile? ImageFile { get; set; }
+
+        public ImageUrl? ImageUrl { get; set; }
     }
 }
