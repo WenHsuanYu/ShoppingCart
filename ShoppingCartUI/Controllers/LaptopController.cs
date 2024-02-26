@@ -9,9 +9,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShoppingCartUI.Data;
 using ShoppingCartUI.Models;
+using System.IO;
 using ShoppingCartUI.Utilities;
 using RestSharp;
 using Newtonsoft.Json;
+using Azure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+
+
+
+#if RELEASE
+
+using Microsoft.AspNetCore.Hosting;
+using Azure.Identity;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+
+#endif
 
 namespace ShoppingCartUI.Controllers
 {
@@ -19,21 +36,39 @@ namespace ShoppingCartUI.Controllers
     public class LaptopController : Controller
     {
         private readonly ApplicationDbContext _context;
+#if DEBUG
         private readonly string? _targetFilePath;
+#endif
         private readonly string? _apikey;
         private readonly ILogger<LaptopController> _logger;
+        private readonly IConfiguration _configuration;
+        private readonly IImageUrlRepository _imageUrlRepository;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public LaptopController(ApplicationDbContext context, IConfiguration config, ILogger<LaptopController> logger)
+        public LaptopController(ApplicationDbContext context, IConfiguration config, ILogger<LaptopController> logger, IWebHostEnvironment hostEnvironment, IImageUrlRepository imageUrlRepository)
         {
             _context = context;
+#if DEBUG
             _targetFilePath = config.GetValue<string>("StoredFilesPath");
+#endif
+            _configuration = config;
             _apikey = config.GetValue<string>("VirusTotal");
             _logger = logger;
+            _imageUrlRepository = imageUrlRepository;
+            _hostEnvironment = hostEnvironment;
         }
 
         // GET: Admin/Create
         public IActionResult Create()
         {
+            //var currentdict = Directory.GetCurrentDirectory();
+            //var wcurr = System.IO.Path.Combine(currentdict, "wwwroot");
+            //if(!Directory.Exists(wcurr))
+            //    _logger.LogInformation(wcurr);
+            //var imgcurr = System.IO.Path.Combine(currentdict, "img");
+            //if(!Directory.Exists(imgcurr))
+            //    _logger.LogInformation(imgcurr);
+            //_logger.LogInformation("This is a create page!" + Directory.GetCurrentDirectory());
             ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "BrandName");
             return View();
         }
@@ -57,18 +92,7 @@ namespace ShoppingCartUI.Controllers
                 await FileHelpers.ProcessFormFile<Laptop>(
                     laptop.ImageFile, ModelState);
 
-            var options = new RestClientOptions("https://www.virustotal.com/api/v3/files");
-            var client = new RestClient(options);
-            var request = new RestRequest("");
-
-            //string fileBase64 = Convert.ToBase64String(formFileContent);
-
-            request.AlwaysMultipartFormData = true;
-            request.AddHeader("accept", "application/json");
-            request.AddHeader("x-apikey", _apikey!);
-            request.FormBoundary = "---011000010111000001101001";
-            request.AddFile("file", formFileContent, laptop.ImageFile!.FileName);
-            var response = await client.PostAsync(request);
+            var response = await ScanVirus("https://www.virustotal.com/api/v3/files", laptop.ImageFile!.FileName, formFileContent);
 
             if (response.IsSuccessful)
             {
@@ -80,11 +104,11 @@ namespace ShoppingCartUI.Controllers
                 {
                     if (ModelState.IsValid)
                     {
+#if DEBUG
                         // For the file name of uploaded file stored
                         // server side, use Path.GetRandomFileName to generate a safe
                         // random file name.
-                        var tmp = Path.GetRandomFileName();
-                        var trustedFileNameForFileStorage = tmp.Split(".")[0] + Path.GetExtension(laptop.ImageFile.FileName);
+                        var trustedFileNameForFileStorage = GenerateRandomFileName(laptop.ImageFile.FileName);
                         string? filePath = null;
                         if (_targetFilePath is not null)
                             filePath = Path.Combine(_targetFilePath, trustedFileNameForFileStorage);
@@ -101,6 +125,73 @@ namespace ShoppingCartUI.Controllers
                             //await FileUpload.FormFile.CopyToAsync(fileStream);
                         }
 
+
+#elif RELEASE
+                        //var fileName = GenerateRandomFileName(laptop.ImageFile.FileName);
+                        laptop.ImageFileName = GenerateRandomFileName(laptop.ImageFile.FileName);
+                        if (laptop.ImageFileName.EndsWith(".webp"))
+                        {
+                            //The best practice is to use Azure Blob Container in conjunction with Azure Front Door to show images in img tags.
+                            var blobServiceClient = GetBlobServiceClient(_configuration.GetValue<string>("accountName")!);
+                            var containerClient = blobServiceClient.GetBlobContainerClient("laptopimageforcart");
+                            await _context.Laptops.AddAsync(laptop);
+                            _context.SaveChanges();
+                            BlobClient blobClient = containerClient.GetBlobClient(laptop.ImageFileName);
+                            BinaryData binaryData = new BinaryData(formFileContent);
+                            await blobClient.UploadAsync(binaryData, true);
+                            //Download the blob to StoredFilesPath
+                            var path = Directory.GetCurrentDirectory();
+                            _logger.LogInformation($"Path is {path}");
+                            if (Path.Exists(path))
+                            {
+                                var uploadedPath = Path.Combine(_hostEnvironment.WebRootPath, "uploadedimg");
+                                try
+                                {
+                                    //_logger.LogInformation($"The Path exists and the Path is {path}. It's ready to download blob.");
+                                    //path = System.IO.Path.Combine(path, "img");
+                                    //if (!Directory.Exists(path))
+                                    //{
+                                    //    Directory.CreateDirectory(path);
+                                    //}
+                                    var filepath = System.IO.Path.Combine(uploadedPath, laptop.ImageFileName);
+                                    _logger.LogInformation($"The Path exists and the Path is {filepath}. It's ready to download blob.");
+                                    await blobClient.DownloadToAsync(filepath);
+                                }
+                                catch (RequestFailedException ex)
+                                {
+                                    _logger.LogInformation($"The exception content is {ex.Message}");
+                                }
+                                catch (DirectoryNotFoundException ex)
+                                {
+                                    _logger.LogInformation($"The exception content is {ex.Message}");
+                                }
+                                catch (FileNotFoundException ex)
+                                {
+                                    _logger.LogInformation($"The exception content is {ex.Message}");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var imgResponse = await UploadImageAsync("https://api.imgur.com/3/image", laptop.ImageFile!.FileName, formFileContent);
+                            if (imgResponse.IsSuccessful)
+                            {
+                                _logger.LogInformation("Image uploaded successfully. Response content:");
+                                dynamic? imgjson = JsonConvert.DeserializeObject(imgResponse.Content);
+                                string id = imgjson is not null ? imgjson.data.id : "";
+                                string url = imgjson is not null ? imgjson.data.link : "";
+                                string deleteHash = imgjson is not null ? imgjson.data.deletehash : "";
+                                laptop.ImageFileName = id + Path.GetExtension(laptop.ImageFileName);
+                                await _imageUrlRepository.AddImageUrlModelAsync(url, deleteHash, laptop);
+                                _logger.LogInformation(imgResponse.Content);
+                            }
+                            else
+                            {
+                                _logger.LogError($"Image upload failed. status code: {imgResponse.StatusCode}, error message: {imgResponse.ErrorMessage}");
+                            }
+                            
+                        }
+#endif  // RELEASE
                         return RedirectToAction(nameof(Index));
                     }
                 }
@@ -138,13 +229,35 @@ namespace ShoppingCartUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var laptop = await _context.Laptops.FindAsync(id);
-            if (laptop != null)
+            var laptop =  await _context.Laptops.Include(l => l.ImageUrl).FirstAsync(m => m.Id == id);
+
+            //string filepath = Path.Combine(_hostEnvironment.WebRootPath, laptop.ImageFileName);
+            //try
+            //{
+            //    if (System.IO.File.Exists(filepath))
+            //        System.IO.File.Delete(filepath);
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogDebug(ex.Message);
+            //}
+            string deleteHash = string.Empty;
+            if (laptop.ImageUrl != null)
             {
-                _context.Laptops.Remove(laptop);
+                deleteHash = await _imageUrlRepository.DeleteImageUrlModelAsync(laptop.ImageUrl);
+            } 
+            else 
+            {
+                string filepath = Path.Combine(_hostEnvironment.WebRootPath, "img" ,laptop.ImageFileName);
+                if (System.IO.File.Exists(filepath))
+                    System.IO.File.Delete(filepath);
+                else 
+                    await RemoveBlobFileAsync(laptop.ImageFileName);
+                _context.Remove(laptop);
             }
 
             await _context.SaveChangesAsync();
+            await DeleteImageAsync("https://api.imgur.com/3/image", deleteHash);
             return RedirectToAction(nameof(Index));
         }
 
@@ -189,7 +302,7 @@ namespace ShoppingCartUI.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ModelName,Processor,Price,BrandId")] Laptop laptop)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ModelName,Processor,ImageFileName,Price,BrandId")] Laptop laptop)
         {
             if (id != laptop.Id)
             {
@@ -223,7 +336,9 @@ namespace ShoppingCartUI.Controllers
         // GET: Admin
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Laptops.Include(l => l.Brand);
+            var applicationDbContext = _context.Laptops.Include(l => l.Brand)
+                                                       .Include(l => l.ImageUrl);
+                                                       
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -264,5 +379,87 @@ namespace ShoppingCartUI.Controllers
         {
             return _context.Laptops.Any(e => e.Id == id);
         }
+
+#if RELEASE
+
+        [NonAction]
+        private BlobServiceClient GetBlobServiceClient(string accountName)
+        {
+            BlobServiceClient client = new(
+                new Uri($"https://{accountName}.blob.core.windows.net"),
+                new DefaultAzureCredential());
+
+            return client;
+        }
+
+#endif
+
+        [NonAction]
+        private async Task<RestResponse> UploadImageAsync(string endpoint, string fileName, byte[] formFileContent)
+        {
+            var options = new RestClientOptions(endpoint);
+            var client = new RestClient(options);
+            var request = new RestRequest("");
+            request.AlwaysMultipartFormData = true;
+            var clientId = _configuration.GetValue<string>("ClientID");
+            request.AddHeader("Authorization", $"Client-ID {clientId}");
+            request.AddHeader("Content-Type", "multipart/form-data");
+            //request.AddHeader("x-apikey", _apikey!);
+            //request.FormBoundary = "---011000010111000001101001";
+            request.AddFile("image", formFileContent, fileName);
+            return await client.PostAsync(request);
+        }
+
+        [NonAction]
+        private async Task DeleteImageAsync(string endpoint, string deleteHash)
+        {
+            var options = new RestClientOptions(endpoint);
+            var client = new RestClient(options);
+            var request = new RestRequest(deleteHash, Method.Delete);
+            var clientId = _configuration.GetValue<string>("ClientID");
+            request.AddHeader("Authorization", $"Client-ID {clientId}");
+            //request.AddHeader("Content-Type", "application/json");
+            var response = await client.ExecuteAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Image is deleted and The content is {0}", response.Content);
+            }
+            else
+            {
+                _logger.LogError("Status code is {0} and the error is {1}", response.StatusCode, response.ErrorMessage);
+            }
+            return;
+        }
+
+        [NonAction]
+        private string GenerateRandomFileName(string fileName)
+        {
+            var tmp = Path.GetRandomFileName();
+            return tmp.Split(".")[0] + Path.GetExtension(fileName);
+        }
+
+        [NonAction]
+        private async Task<RestResponse> ScanVirus(string endpoint, string fileName ,byte[] content)
+        {
+            var options = new RestClientOptions(endpoint);
+            var client = new RestClient(options);
+            var request = new RestRequest("");
+            request.AlwaysMultipartFormData = true;
+            request.AddHeader("accept", "application/json");
+            request.AddHeader("x-apikey", _apikey!);
+            request.FormBoundary = "---011000010111000001101001";
+            request.AddFile("file", content, fileName);
+            return await client.PostAsync(request);
+        }
+
+        [NonAction]
+        private async Task RemoveBlobFileAsync(string imageName)
+        {
+            var blobServiceClient = GetBlobServiceClient(_configuration.GetValue<string>("accountName")!);
+            var containerClient = blobServiceClient.GetBlobContainerClient("laptopimageforcart");
+            BlobClient blobClient = containerClient.GetBlobClient(imageName);
+            await blobClient.DeleteAsync();
+        }
+
     }
 }
