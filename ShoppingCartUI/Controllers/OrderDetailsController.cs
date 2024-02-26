@@ -242,12 +242,13 @@ namespace ShoppingCartUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int orderId)
         {
-            var orderDetail = _context.OrderDetails.Where(m => m.OrderId == orderId);
-            if (orderDetail != null)
-            {
-                foreach (var item in orderDetail)
-                    _context.OrderDetails.Remove(item);
-            }
+            var order = _context.Orders.Include(o => o.OrderDetail).Where(o => o.Id == orderId).First();
+            //var orderDetail = _context.OrderDetails.Include(o => o.Order).Where(m => m.OrderId == orderId);
+            //if (orderDetail != null)
+            //{
+            //    foreach (var item in orderDetail)
+            _context.Remove(order);
+            //}
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
