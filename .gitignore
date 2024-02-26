@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /ShoppingCartUI/Properties/serviceDependencies.ShoppingCartUI20240222004442 - Web Deploy.json
 /ShoppingCartUI/Properties/serviceDependencies.json
 /ShoppingCartUI/Properties/serviceDependencies.local.json
+/ShoppingCartUI/appsettings.Production.json
