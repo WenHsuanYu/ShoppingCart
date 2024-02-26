@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ShoppingCartUI/Properties/ServiceDependencies/ShoppingCartUI20240222004442 - Web Deploy
+/ShoppingCartUI/Properties/serviceDependencies.ShoppingCartUI20240222004442 - Web Deploy.json
+/ShoppingCartUI/Properties/serviceDependencies.json
+/ShoppingCartUI/Properties/serviceDependencies.local.json
