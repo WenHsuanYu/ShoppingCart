@@ -264,6 +264,32 @@ namespace ShoppingCartUI.Data.Migrations
                     b.ToTable("CartDetail", (string)null);
                 });
 
+            modelBuilder.Entity("ShoppingCartUI.Models.ImageUrl", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DeleteHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LaptopId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaptopId")
+                        .IsUnique();
+
+                    b.ToTable("ImageUrl", (string)null);
+                });
+
             modelBuilder.Entity("ShoppingCartUI.Models.Laptop", b =>
                 {
                     b.Property<int>("Id")
@@ -471,6 +497,17 @@ namespace ShoppingCartUI.Data.Migrations
                     b.Navigation("ShoppingCart");
                 });
 
+            modelBuilder.Entity("ShoppingCartUI.Models.ImageUrl", b =>
+                {
+                    b.HasOne("ShoppingCartUI.Models.Laptop", "Laptop")
+                        .WithOne("ImageUrl")
+                        .HasForeignKey("ShoppingCartUI.Models.ImageUrl", "LaptopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Laptop");
+                });
+
             modelBuilder.Entity("ShoppingCartUI.Models.Laptop", b =>
                 {
                     b.HasOne("ShoppingCartUI.Models.Brand", "Brand")
@@ -520,6 +557,8 @@ namespace ShoppingCartUI.Data.Migrations
             modelBuilder.Entity("ShoppingCartUI.Models.Laptop", b =>
                 {
                     b.Navigation("CartDetail");
+
+                    b.Navigation("ImageUrl");
 
                     b.Navigation("OrderDetail");
                 });
