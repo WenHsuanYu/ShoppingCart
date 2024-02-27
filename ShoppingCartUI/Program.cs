@@ -27,7 +27,7 @@ if (builder.Environment.IsProduction())
 #if DEBUG
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 #elif RELEASE
-var connectionString = builder.Configuration.GetConnectionString("ConnectionString") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 #endif
 
 builder.Logging.AddApplicationInsights();
@@ -71,8 +71,15 @@ builder.Services
             options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
             options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 #elif RELEASE
-        options.ClientId = builder.Configuration["GoogleClientId"];
-        options.ClientSecret = builder.Configuration["GoogleClientSecret"];
+        if (builder.Configuration["GoogleClientId"] != null)
+        {
+            options.ClientId = builder.Configuration["GoogleClientId"]!;
+        }
+
+        if (builder.Configuration["GoogleClientSecret"] != null)
+        {
+            options.ClientSecret = builder.Configuration["GoogleClientSecret"]!;
+        }
 
 #endif
     });
@@ -88,17 +95,19 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 #if RELEASE
 builder.Services.AddAzureClients(clientBuilder =>
 {
-    clientBuilder.AddBlobServiceClient(builder.Configuration["limg:blob"]!, preferMsi: true);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["limg:queue"]!, preferMsi: true);
+    if (builder.Configuration["limg:blob"] != null)
+        clientBuilder.AddBlobServiceClient(builder.Configuration["limg:blob"]!, preferMsi: true);
+    if (builder.Configuration["limg:queue"] != null)
+        clientBuilder.AddQueueServiceClient(builder.Configuration["limg:queue"]!, preferMsi: true);
 });
 #endif
 
 var app = builder.Build();
-//using (var scope = app.Services.CreateScope())
-//{
-//    var services = scope.ServiceProvider;
-//    await Seeder.SeedDefaultData(services);
-//}
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await Seeder.SeedDefaultData(services);
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

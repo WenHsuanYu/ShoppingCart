@@ -16,19 +16,12 @@ using Newtonsoft.Json;
 using Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-
-
-
-#if RELEASE
-
 using Microsoft.AspNetCore.Hosting;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 
-#endif
 
 namespace ShoppingCartUI.Controllers
 {
@@ -92,13 +85,13 @@ namespace ShoppingCartUI.Controllers
                 await FileHelpers.ProcessFormFile<Laptop>(
                     laptop.ImageFile, ModelState);
 
-            var response = await ScanVirus("https://www.virustotal.com/api/v3/files", laptop.ImageFile!.FileName, formFileContent);
+            RestResponse response = await ScanVirus("https://www.virustotal.com/api/v3/files", laptop.ImageFile!.FileName, formFileContent);
 
             if (response.IsSuccessful)
             {
                 _logger.LogInformation("File successfully uploaded to VirusTotal, checking report...");
 
-                dynamic? json = JsonConvert.DeserializeObject(response.Content);
+                dynamic? json = JsonConvert.DeserializeObject(response.Content!);
                 string resource = json is not null ? json.data.id : "";
                 if (await GetReport(resource, _apikey!))
                 {
@@ -137,11 +130,11 @@ namespace ShoppingCartUI.Controllers
                             await _context.Laptops.AddAsync(laptop);
                             _context.SaveChanges();
                             BlobClient blobClient = containerClient.GetBlobClient(laptop.ImageFileName);
-                            BinaryData binaryData = new BinaryData(formFileContent);
+                            BinaryData binaryData = new(formFileContent);
                             await blobClient.UploadAsync(binaryData, true);
                             //Download the blob to StoredFilesPath
                             var path = Directory.GetCurrentDirectory();
-                            _logger.LogInformation($"Path is {path}");
+                            _logger.LogInformation("Path is {path}", path);
                             if (Path.Exists(path))
                             {
                                 var uploadedPath = Path.Combine(_hostEnvironment.WebRootPath, "uploadedimg");
@@ -154,40 +147,40 @@ namespace ShoppingCartUI.Controllers
                                     //    Directory.CreateDirectory(path);
                                     //}
                                     var filepath = System.IO.Path.Combine(uploadedPath, laptop.ImageFileName);
-                                    _logger.LogInformation($"The Path exists and the Path is {filepath}. It's ready to download blob.");
+                                    _logger.LogInformation("The Path exists and the Path is {filepath}. It's ready to download blob.", filepath);
                                     await blobClient.DownloadToAsync(filepath);
                                 }
                                 catch (RequestFailedException ex)
                                 {
-                                    _logger.LogInformation($"The exception content is {ex.Message}");
+                                    _logger.LogInformation("The exception content is {ex.Message}", ex.Message);
                                 }
                                 catch (DirectoryNotFoundException ex)
                                 {
-                                    _logger.LogInformation($"The exception content is {ex.Message}");
+                                    _logger.LogInformation("The exception content is {ex.Message}", ex.Message);
                                 }
                                 catch (FileNotFoundException ex)
                                 {
-                                    _logger.LogInformation($"The exception content is {ex.Message}");
+                                    _logger.LogInformation("The exception content is {ex.Message}", ex.Message);
                                 }
                             }
                         }
                         else
                         {
-                            var imgResponse = await UploadImageAsync("https://api.imgur.com/3/image", laptop.ImageFile!.FileName, formFileContent);
+                            RestResponse imgResponse = await UploadImageAsync("https://api.imgur.com/3/image", laptop.ImageFile!.FileName, formFileContent);
                             if (imgResponse.IsSuccessful)
                             {
                                 _logger.LogInformation("Image uploaded successfully. Response content:");
-                                dynamic? imgjson = JsonConvert.DeserializeObject(imgResponse.Content);
+                                dynamic? imgjson = JsonConvert.DeserializeObject(imgResponse.Content!);
                                 string id = imgjson is not null ? imgjson.data.id : "";
                                 string url = imgjson is not null ? imgjson.data.link : "";
                                 string deleteHash = imgjson is not null ? imgjson.data.deletehash : "";
                                 laptop.ImageFileName = id + Path.GetExtension(laptop.ImageFileName);
                                 await _imageUrlRepository.AddImageUrlModelAsync(url, deleteHash, laptop);
-                                _logger.LogInformation(imgResponse.Content);
+                                _logger.LogInformation("{imgResponse.Content}", imgResponse.Content);
                             }
                             else
                             {
-                                _logger.LogError($"Image upload failed. status code: {imgResponse.StatusCode}, error message: {imgResponse.ErrorMessage}");
+                                _logger.LogError("Image upload failed. status code: {imgResponse.StatusCode}, error message: {imgResponse.ErrorMessage}", imgResponse.StatusCode, imgResponse.ErrorMessage);
                             }
                             
                         }
@@ -198,7 +191,7 @@ namespace ShoppingCartUI.Controllers
             }
             else
             {
-                _logger.LogError("Failed to upload file to VirusTotal:" + response.Content);
+                _logger.LogError("Failed to upload file to VirusTotal: {response.Content}", response.Content);
             }
             ModelState.AddModelError("ImageFile", "The uploaded file is not a valid image file. Please upload a valid image file.");
             ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "BrandName", laptop.BrandId);
@@ -248,11 +241,11 @@ namespace ShoppingCartUI.Controllers
             } 
             else 
             {
-                string filepath = Path.Combine(_hostEnvironment.WebRootPath, "img" ,laptop.ImageFileName);
+                string filepath = Path.Combine(_hostEnvironment.WebRootPath, "img" ,laptop.ImageFileName!);
                 if (System.IO.File.Exists(filepath))
                     System.IO.File.Delete(filepath);
                 else 
-                    await RemoveBlobFileAsync(laptop.ImageFileName);
+                    await RemoveBlobFileAsync(laptop.ImageFileName!);
                 _context.Remove(laptop);
             }
 
@@ -354,9 +347,9 @@ namespace ShoppingCartUI.Controllers
             if (response.IsSuccessful)
             {
                 // Parse the response and check the detection results
-                dynamic? json = JsonConvert.DeserializeObject(response.Content);
+                dynamic? json = JsonConvert.DeserializeObject(response.Content!);
                 int detectedCount = json?.data.attributes.stats.harmless + json?.data.attributes.stats.malicious;
-                _logger.LogInformation("Number of engines detected：" + detectedCount);
+                _logger.LogInformation("Number of engines detected： {detectedCount}", detectedCount);
                 if (detectedCount > 0)
                 {
                     _logger.LogInformation("Some engines have detected that this file contains malicious code.");
@@ -370,7 +363,7 @@ namespace ShoppingCartUI.Controllers
             }
             else
             {
-                _logger.LogError("Unable to retrieve report:" + response.Content);
+                _logger.LogError("Unable to retrieve report: {response.Content}", response.Content);
                 return true;
             }
         }
@@ -380,10 +373,8 @@ namespace ShoppingCartUI.Controllers
             return _context.Laptops.Any(e => e.Id == id);
         }
 
-#if RELEASE
-
         [NonAction]
-        private BlobServiceClient GetBlobServiceClient(string accountName)
+        private static BlobServiceClient GetBlobServiceClient(string accountName)
         {
             BlobServiceClient client = new(
                 new Uri($"https://{accountName}.blob.core.windows.net"),
@@ -392,15 +383,16 @@ namespace ShoppingCartUI.Controllers
             return client;
         }
 
-#endif
 
         [NonAction]
         private async Task<RestResponse> UploadImageAsync(string endpoint, string fileName, byte[] formFileContent)
         {
             var options = new RestClientOptions(endpoint);
             var client = new RestClient(options);
-            var request = new RestRequest("");
-            request.AlwaysMultipartFormData = true;
+            var request = new RestRequest("")
+            {
+                AlwaysMultipartFormData = true
+            };
             var clientId = _configuration.GetValue<string>("ClientID");
             request.AddHeader("Authorization", $"Client-ID {clientId}");
             request.AddHeader("Content-Type", "multipart/form-data");
@@ -422,17 +414,17 @@ namespace ShoppingCartUI.Controllers
             var response = await client.ExecuteAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("Image is deleted and The content is {0}", response.Content);
+                _logger.LogInformation("Image is deleted and The content is {response.Content}", response.Content);
             }
             else
             {
-                _logger.LogError("Status code is {0} and the error is {1}", response.StatusCode, response.ErrorMessage);
+                _logger.LogError("Status code is {response.StatusCode} and the error is {response.ErrorMessage}", response.StatusCode, response.ErrorMessage);
             }
             return;
         }
 
         [NonAction]
-        private string GenerateRandomFileName(string fileName)
+        private static string GenerateRandomFileName(string fileName)
         {
             var tmp = Path.GetRandomFileName();
             return tmp.Split(".")[0] + Path.GetExtension(fileName);
@@ -443,8 +435,10 @@ namespace ShoppingCartUI.Controllers
         {
             var options = new RestClientOptions(endpoint);
             var client = new RestClient(options);
-            var request = new RestRequest("");
-            request.AlwaysMultipartFormData = true;
+            var request = new RestRequest("")
+            {
+                AlwaysMultipartFormData = true
+            };
             request.AddHeader("accept", "application/json");
             request.AddHeader("x-apikey", _apikey!);
             request.FormBoundary = "---011000010111000001101001";
