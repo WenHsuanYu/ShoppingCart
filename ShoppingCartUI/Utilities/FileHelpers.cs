@@ -10,13 +10,19 @@ namespace ShoppingCartUI.Utilities
         public static async Task<byte[]> ProcessFormFile<T>(IFormFile? formFile,
             ModelStateDictionary modelState)
         {
+            
+            if (formFile == null)
+            {
+                return [];
+            }
+            
             var fieldDisplayName = string.Empty;
             // Use reflection to obtain the display name for the model
             // property associated with this IFormFile. If a display
             // name isn't found, error messages simply won't show
             // a display name.
-            MemberInfo? property = typeof(T).GetProperty(formFile.Name.Substring(
-                formFile.Name.IndexOf(".", StringComparison.Ordinal) + 1));
+            MemberInfo? property = typeof(T).GetProperty(formFile.Name[
+                (formFile.Name.IndexOf('.', StringComparison.Ordinal) + 1)..]);
             if (property is not null)
             {
                 if (property.GetCustomAttribute(typeof(DisplayAttribute)) is
@@ -38,25 +44,23 @@ namespace ShoppingCartUI.Utilities
                 modelState.AddModelError(formFile.Name,
                     $"{fieldDisplayName}({trustedFileNameForDisplay}) is empty.");
 
-                return Array.Empty<byte>();
+                return [];
             }
 
             try
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await formFile.CopyToAsync(memoryStream);
+                using var memoryStream = new MemoryStream();
+                await formFile.CopyToAsync(memoryStream);
 
-                    // Check the content length in case the file's only
-                    // content was a BOM and the content is actually
-                    // empty after the BOM was removed.
-                    if (memoryStream.Length == 0)
-                    {
-                        modelState.AddModelError(formFile.Name,
-                            $"{fieldDisplayName}({trustedFileNameForDisplay}) is empty.");
-                    }
-                    return memoryStream.ToArray();
+                // Check the content length in case the file's only
+                // content was a BOM and the content is actually
+                // empty after the BOM was removed.
+                if (memoryStream.Length == 0)
+                {
+                    modelState.AddModelError(formFile.Name,
+                        $"{fieldDisplayName}({trustedFileNameForDisplay}) is empty.");
                 }
+                return memoryStream.ToArray();
             }
             catch (Exception ex)
             {
@@ -65,7 +69,7 @@ namespace ShoppingCartUI.Utilities
                     $"Please contact the Help Desk for support. Error: {ex.HResult}");
             }
 
-            return Array.Empty<byte>();
+            return [];
         }
     }
 }

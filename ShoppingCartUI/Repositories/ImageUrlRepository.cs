@@ -22,7 +22,7 @@ namespace ShoppingCartUI.Repositories
             {
                 await _context.Laptops.AddAsync(laptop);
                 _context.SaveChanges();
-                ImageUrl imageurl = new ImageUrl
+                ImageUrl imageurl = new()
                 {
                     Url = url,
                     DeleteHash = hash,
@@ -33,19 +33,19 @@ namespace ShoppingCartUI.Repositories
             }
             catch (OperationCanceledException e)
             {
-                _logger.LogCritical($"{e.Message}");
+                _logger.LogCritical("{e.Message}", e.Message);
             }
             catch (DbUpdateConcurrencyException e)
             {
-                _logger.LogCritical($"{e.Message}");
+                _logger.LogCritical("{e.Message}", e.Message);
             }
             catch (DbUpdateException e)
             {
-                _logger.LogCritical($"{e.Message}");
+                _logger.LogCritical("{e.Message}", e.Message);
             }
             catch (Exception e)
             {
-                _logger.LogCritical($"{e.Message}");
+                _logger.LogCritical("{e.Message}", e.Message);
             }
             finally
             {
@@ -56,7 +56,7 @@ namespace ShoppingCartUI.Repositories
         public async Task<string> DeleteImageUrlModelAsync(ImageUrl imageUrl)
         {
             var laptop = await _context.Laptops.Include(x => x.ImageUrl).FirstAsync(x => x.ImageUrl == imageUrl);
-            string? hash = laptop?.ImageUrl?.DeleteHash;
+            string hash = laptop?.ImageUrl?.DeleteHash ?? string.Empty;
             if (laptop is not null)
                 _context.Remove(laptop);
             await _context.SaveChangesAsync();

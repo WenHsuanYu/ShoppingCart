@@ -11,6 +11,6 @@ namespace ShoppingCartUI.Models
         [Required]
         [MaxLength(40, ErrorMessage = "Brand name cannot be longer than 40 characters.")]
         public required string BrandName { get; set; }
-        public List<Laptop> Laptops { get; set;} = new List<Laptop>();
+        public List<Laptop> Laptops { get; set;} = [];
     }
 }

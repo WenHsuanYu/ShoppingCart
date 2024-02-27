@@ -26,8 +26,8 @@ namespace ShoppingCartUI.Models
         public int BrandId { get; set; }
 
         public Brand? Brand { get; set; }
-        public List<CartDetail> CartDetail { get; set; } = new List<CartDetail>();
-        public List<OrderDetail> OrderDetail { get; set; } = new List<OrderDetail>();
+        public List<CartDetail> CartDetail { get; set; } = [];
+        public List<OrderDetail> OrderDetail { get; set; } = [];
 
         [Display(Name = "Brand Name")]
         [NotMapped]
@@ -37,7 +37,7 @@ namespace ShoppingCartUI.Models
         [Display(Name = "Upload Image")]
         [DataType(DataType.Upload)]
         [MaxFileSize(3 * 1024 * 1024)]
-        [AllowedExtensions(new string[] { ".jpg", ".png", ".jpeg", ".webp" })]
+        [AllowedExtensions([".jpg", ".png", ".jpeg", ".webp"])]
         public IFormFile? ImageFile { get; set; }
 
         public ImageUrl? ImageUrl { get; set; }

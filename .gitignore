@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /ShoppingCartUI/Properties/serviceDependencies.json
 /ShoppingCartUI/Properties/serviceDependencies.local.json
 /ShoppingCartUI/appsettings.Production.json
+/ShoppingCartUI/efpt.config.json
