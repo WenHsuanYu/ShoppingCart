@@ -23,7 +23,10 @@
                                 @order.CreateDate.ToString("MM-dd-yyyy")
                             </td>
                             <td>
-                                @order.OrderStatus.StatusName <i class="bi bi-chevron-down"></i>
+                                @if (order.OrderStatus != null)
+                                {
+                                    @order.OrderStatus.StatusName <i class="bi bi-chevron-down"></i>
+                                }
                             </td>
                         </tr>
                         @if (order.OrderDetail is not null && order.OrderDetail.Count > 0)
@@ -46,33 +49,45 @@
                                             {
 
                                             <tr>
-                                                <td>@item.Laptop?.ModelName</td>
-                                                <td>
-                                                        @if (string.IsNullOrEmpty(@item.Laptop?.ImageFileName))
-                                                        {
-                                                                <img src="/img/noimage.webp" style="width:80px;height:100px" />
-                                                        }
-                                                        else
-                                                        {
-                                                            if (System.IO.Path.Exists($"wwwroot/img/{item.Laptop.ImageFileName}"))
+                                                @if (item is not null)
+                                                {
+                                                    <td>@item.Laptop?.ModelName</td>
+                                                    <td>
+                                                            @if (string.IsNullOrEmpty(@item.Laptop?.ImageFileName))
                                                             {
-                                                                <img src="/img/@item.Laptop.ImageFileName" style="width:80px;height:100px" alt="..."/>
-                                                            }
-                                                            else if (System.IO.Path.Exists($"wwwroot/uploadedimg/{item.Laptop.ImageFileName}"))
-                                                            {
-                                                                <img src="/uploadedimg/@item.Laptop.ImageFileName" style="width:80px;height:100px" alt="..."/>
+                                                                    <img src="/img/noimage.webp" style="width:80px;height:100px" />
                                                             }
                                                             else
                                                             {
-                                                                <img src="@item?.Laptop?.ImageUrl?.Url" style="width:80px;height:100px" alt="..."/>
-                                                            }
+                                                                if (System.IO.Path.Exists($"wwwroot/img/{item.Laptop.ImageFileName}"))
+                                                                {
+                                                                    <img src="/img/@item.Laptop.ImageFileName" style="width:80px;height:100px" alt="..."/>
+                                                                }
+                                                                else if (System.IO.Path.Exists($"wwwroot/uploadedimg/{item.Laptop.ImageFileName}"))
+                                                                {
+                                                                    <img src="/uploadedimg/@item.Laptop.ImageFileName" style="width:80px;height:100px" alt="..."/>
+                                                                }
+                                                                else
+                                                                {
+                                                                    if(item != null && item.Laptop != null && item.Laptop.ImageUrl != null)
+                                                                    {
+                                                                        <img src="@item.Laptop.ImageUrl.Url" style="width:80px;height:100px" alt="..."/>
+                                                                    }
+                                                                }
 
-                                                        }
-                                                </td>
-                                                <td>@item!.Laptop?.Brand?.BrandName</td>
-                                                <td>@item.Laptop?.Price</td>
-                                                <td>@item.Quantity</td>
-                                                <td>@(item.Laptop?.Price * item.Quantity)</td>
+                                                            }
+                                                    </td>
+                                                    @if (item!.Laptop != null) {
+                                                        <td>@if (item.Laptop.Brand != null)
+                                                            { 
+                                                                @item.Laptop.Brand.BrandName
+                                                            }
+                                                        </td>
+                                                        <td>@item.Laptop.Price</td>
+                                                        <td>@item.Quantity</td>
+                                                        <td>@(item.Laptop.Price * item.Quantity)</td>
+                                                    }
+                                                }
                                             </tr>
                                             }
                                             <tr>

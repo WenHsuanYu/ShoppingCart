@@ -22,10 +22,10 @@
                 @Html.DisplayNameFor(model => model.Order)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Order.CreateDate)
+                @Html.DisplayNameFor(model => model.Order!.CreateDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Order.Email)
+                @Html.DisplayNameFor(model => model.Order!.Email)
             </th>
             @* <th>
                 @Html.DisplayNameFor(model => model.Laptop)
@@ -51,10 +51,16 @@
                         @Html.DisplayFor(modelItem => item.OrderId)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Order.CreateDate)
+                        @if (item.Order is not null)
+                        {
+                            @Html.DisplayFor(modelItem => item.Order.CreateDate)
+                        }
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Order.Email)
+                        @if (item.Order is not null)
+                        {
+                            @Html.DisplayFor(modelItem => item.Order.Email)
+                        }
                     </td>
                     @*<td>
                         @Html.DisplayFor(modelItem => item.Laptop.ModelName)

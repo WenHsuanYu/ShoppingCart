@@ -25,47 +25,55 @@
             <tbody>
                 @foreach (var item in Model.CartDetails)
                 {
-                    <tr>
-                        <td>@item.Laptop?.ModelName</td>
-                        <td>
-                            @if (string.IsNullOrEmpty(@item.Laptop?.ImageFileName))
-                            {
-                                <img src="/img/noimage.webp" style="width:80px;height:100px" />
-                            }
-                            else
-                            {
-@*                                 if (File.Exists($"wwwroot/img/{item.Laptop?.ImageFileName}"))
+                    if (item != null && item.Laptop != null)
+                    {
+                        <tr>
+                            <td>@item.Laptop.ModelName</td>
+                            <td>
+                                @if (string.IsNullOrEmpty(@item.Laptop.ImageFileName))
                                 {
-                                    <img style="width:80px;height:100px" src="/img/@item.Laptop!.ImageFileName">
+                                    <img src="/img/noimage.webp" style="width:80px;height:100px" />
                                 }
                                 else
                                 {
-                                    <img style="width:80px;height:100px" src="@item.Laptop.ImageUrl.Url">
-                                } *@
-                                if (System.IO.Path.Exists($"wwwroot/img/{item.Laptop.ImageFileName}"))
-                                {
-                                    <img style="width:80px;height:100px" src="/img/@item.Laptop.ImageFileName" alt="...">
+    @*                                 if (File.Exists($"wwwroot/img/{item.Laptop?.ImageFileName}"))
+                                    {
+                                        <img style="width:80px;height:100px" src="/img/@item.Laptop!.ImageFileName">
+                                    }
+                                    else
+                                    {
+                                        <img style="width:80px;height:100px" src="@item.Laptop.ImageUrl.Url">
+                                    } *@
+                                    if (System.IO.Path.Exists($"wwwroot/img/{item.Laptop.ImageFileName}"))
+                                    {
+                                        <img style="width:80px;height:100px" src="/img/@item.Laptop.ImageFileName" alt="...">
+                                    }
+                                    else if (System.IO.Path.Exists($"wwwroot/uploadedimg/{item.Laptop.ImageFileName}"))
+                                    {
+                                        <img style="width:80px;height:100px" src="/uploadedimg/@item.Laptop.ImageFileName" alt="...">
+                                    }
+                                    else
+                                    {
+                                        <img style="width:80px;height:100px" src="@item?.Laptop?.ImageUrl?.Url" alt="...">
+                                    }
                                 }
-                                else if (System.IO.Path.Exists($"wwwroot/uploadedimg/{item.Laptop.ImageFileName}"))
+                            </td>
+                            <td>
+                                @if (item!.Laptop.Brand is not null)
                                 {
-                                    <img style="width:80px;height:100px" src="/uploadedimg/@item.Laptop.ImageFileName" alt="...">
+                                    @item.Laptop.Brand.BrandName;
                                 }
-                                else
-                                {
-                                    <img style="width:80px;height:100px" src="@item?.Laptop?.ImageUrl?.Url" alt="...">
-                                }
-                            }
-                        </td>
-                        <td>@item.Laptop?.Brand?.BrandName</td>
-                        <td>@item.Laptop?.Price</td>
-                        <td>@item.Quantity</td>
-                        <td>@(item.Laptop?.Price * item.Quantity)</td>
-                        <td>
-                            <button type="button" data-id="@item.Laptop.Id" class="inc btn btn-primary"><i class="bi bi-arrow-up"></i></button>
-                            <button type="button" data-id="@item.Laptop.Id" class="dec btn btn-primary"><i class="bi bi-arrow-down"></i></button>
-                            <input id="RequestVerificationToken" type="hidden" value="@requestToken" />
-                        </td>
-                    </tr>
+                            </td>
+                            <td>@item.Laptop.Price</td>
+                            <td>@item.Quantity</td>
+                            <td>@(item.Laptop.Price * item.Quantity)</td>
+                            <td>
+                                <button type="button" data-id="@item.Laptop.Id" class="inc btn btn-primary"><i class="bi bi-arrow-up"></i></button>
+                                <button type="button" data-id="@item.Laptop.Id" class="dec btn btn-primary"><i class="bi bi-arrow-down"></i></button>
+                                <input id="RequestVerificationToken" type="hidden" value="@requestToken" />
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>    
         </table>

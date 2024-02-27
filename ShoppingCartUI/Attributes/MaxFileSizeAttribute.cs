@@ -16,7 +16,7 @@ namespace ShoppingCartUI.Attributes
             return $"Maximum allowed file size is {_maxFileSize} bytes.";
         }
 
-        protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             var file = value as IFormFile;
             if (file != null)

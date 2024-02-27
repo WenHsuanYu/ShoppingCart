@@ -30,7 +30,6 @@
             <div class="form-group">
                 <label asp-for="ImageFile" class="control-label"></label>
                 <input type="file" asp-for="ImageFile" class="form-control" />
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
                 @Html.ValidationMessageFor(model => model.ImageFile, "", new { @class = "text-danger" })
             </div>
             <div class="form-group">
