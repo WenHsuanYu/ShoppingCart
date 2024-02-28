@@ -1,6 +1,6 @@
 # ShoppingCart
 
-[Demo website](https://shoppingcartui20240222004442.azurewebsites.net/Home/Index)
+[Demo website](https://shoppingcartui20240228220229.azurewebsites.net/)
 
 主要使用 ASP.NET Core MVC 框架和預設 Jquery & Bootstrap，主要用到的 packages or tools 如下
 - EF Core
