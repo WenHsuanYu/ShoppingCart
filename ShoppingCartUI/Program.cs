@@ -12,6 +12,11 @@ using Azure.Identity;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging.ApplicationInsights;
+using Microsoft.AspNetCore.DataProtection;
+using Azure.Extensions.AspNetCore.DataProtection.Blobs;
+using Azure.Extensions.AspNetCore.DataProtection.Keys;
+using Azure.Security.KeyVault.Secrets;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +24,7 @@ var builder = WebApplication.CreateBuilder(args);
 if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddAzureKeyVault(
-        new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
+        vaultUri:new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
         new DefaultAzureCredential());
 }
 
@@ -92,7 +97,6 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 {
     options.ValidationInterval = TimeSpan.FromMinutes(15);
 });
-#if RELEASE
 builder.Services.AddAzureClients(clientBuilder =>
 {
     if (builder.Configuration["limg:blob"] != null)
@@ -100,7 +104,13 @@ builder.Services.AddAzureClients(clientBuilder =>
     if (builder.Configuration["limg:queue"] != null)
         clientBuilder.AddQueueServiceClient(builder.Configuration["limg:queue"]!, preferMsi: true);
 });
-#endif
+//string keyVaultName = builder.Configuration["KeyVaultName"] ?? throw new Exception("can not get key vault name");
+//var kvUri = "https://" + keyVaultName + ".vault.azure.net";
+//var client = new SecretClient(new Uri(kvUri), new DefaultAzureCredential());
+//var urlWithSAS = await client.GetSecretAsync("blobUriWithSasToken");
+//var urlWithdataProtection = await client.GetSecretAsync("dataprotection");
+builder.Services.AddDataProtection();
+                    
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
